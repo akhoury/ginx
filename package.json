@@ -1,0 +1,21 @@
+{
+    "name": "ginxparser",
+    "version": "0.0.1",
+    "directories": {
+        "lib": "./lib"
+    },
+    "main": "./lib/ginxparser",
+    "engines": {
+        "node" : ">=0.8.11"
+    },
+    "dependencies": {
+    },
+    "description": "An Nginx log parser for node.js written in Javascript.",
+    "author": "Aziz Khoury<bentael@gmail.com>",
+    "homepage": "https://github.com/akhoury/ginxparser",
+    "repository" :
+    {
+        "type" : "git",
+        "url" : "git://github.com/akhoury/ginxparser.git"
+    }
+}
