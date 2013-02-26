@@ -6,7 +6,7 @@ var parser = new GinxParser();
 
 /**
  * FOR DEMO PURPOSES ONLY
- * I use tthe GinxParserTest to create 30 copy of log files in 
+ * I use the GinxParserTest to create 30 copy of log files in 
  *   ./test/tmplogs from either ./test/logs/nginx_prod-large.log or ./test/logs/nginx_prod-small.log 
  * you will usually have your own log files
  * and since I need to wait for these the files to be created before I actually start parsing, I pass the parsing code in a callback
@@ -25,7 +25,7 @@ var parser = new GinxParser();
        if (err) throw err;
        /* 
          uncomment under your own risk :P - this will print out every row, 
-         usually these would be persisted to the database, or handled in an analysis, or for search
+         usually these would be persisted to the database, or handled in an analysis, or search
        */
          //console.log(row);
        },
@@ -43,7 +43,7 @@ var parser = new GinxParser();
         if (err) throw err;
         /* 
           uncomment under your own risk - this will print out every row, 
-          usually these would be persisted to the database, or handled in an analysis, or for search
+          usually these would be persisted to the database, or handled in an analysis, or search
         */
           //console.log(row);
         },

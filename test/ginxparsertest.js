@@ -1,4 +1,4 @@
-  fs = require('fs-extra');
+ var fs = require('fs-extra'), path = require('path');
 
   /**
    * GinxParser constructor
@@ -13,9 +13,9 @@
     this.delimeters = this.format.match(/[^\$\w+]+/g);
     this.attrs = this.format.match(/\$\w+/g);
     this.defaultCopies = 30;
-    this.defaultOrgSmallLog = './test/logs/nginx_prod-small.log'
-    this.defaultOrgLargeLog = './test/logs/nginx_prod-large.log'
-    this.defaultTmpLogsDir = './test/tmplogs';
+    this.defaultOrgSmallLog = path.normalize('./test/logs/nginx_prod-small.log');
+    this.defaultOrgLargeLog = path.normalize('./test/logs/nginx_prod-large.log');
+    this.defaultTmpLogsDir = path.normalize('./test/tmplogs');
     this.LARGE = 'large';
     this.small = 'small';
   }
@@ -27,6 +27,8 @@ GinxParserTest.prototype.setupTest = function(count,logSize, callback){
   var that = this;
   fs.remove(dir, function(){
     fs.mkdirs(dir, function(){
+     //testing a random dir in the log dir, THIS WILL BLOCK just to test
+     fs.mkdirSync(path.join(dir,'randomFolder')); 
      that.copyLogFiles(count, logSize, callback);
     });
   });
@@ -34,24 +36,29 @@ GinxParserTest.prototype.setupTest = function(count,logSize, callback){
 
 GinxParserTest.prototype.copyLogFiles = function(n, size, callback){
   if (size === this.SMALL){
-    this.copySmallLogs(n);
+    this.copySmallLogs(n, callback);
   } else if (size === this.LARGE){
-    this.copyLargeLogs(n);
+    this.copyLargeLogs(n, callback);
   }
-  callback(true);
 };
 
-GinxParserTest.prototype.copyFileMultipleToTmpLogs = function(nbCopies, file){
-  var trgFile, srcFile = file;        
-  for (var i = 0; i < nbCopies; i++){
-    trgFile = this.defaultTmpLogsDir + '/nginx' + i + '.log'; 
-    fs.copy(file,trgFile);
+GinxParserTest.prototype.copyFileMultipleToTmpLogs = function(nbCopies, file, callback){
+  var trgFile, srcFile = file, that = this;
+  if (nbCopies > 0 ){  
+    trgFile = path.join(this.defaultTmpLogsDir, 'nginx' + nbCopies + '.log'); 
+    fs.copy(file,trgFile, function(err){
+      if(err) throw err
+      that.copyFileMultipleToTmpLogs(nbCopies-1, file, callback);
+    });
+  }
+  else {
+    callback(true)
   }
 }
-GinxParserTest.prototype.copySmallLogs = function(n){
-  this.copyFileMultipleToTmpLogs(n, this.defaultOrgSmallLog);
+GinxParserTest.prototype.copySmallLogs = function(n, callback){
+  this.copyFileMultipleToTmpLogs(n, this.defaultOrgSmallLog, callback);
 }
-GinxParserTest.prototype.copyLargeLogs = function(n){
-  this.copyFileMultipleToTmpLogs(n, this.defaultOrgLargeLog);
+GinxParserTest.prototype.copyLargeLogs = function(n, callback){
+  this.copyFileMultipleToTmpLogs(n, this.defaultOrgLargeLog, callback);
 }
 module.exports = GinxParserTest;
