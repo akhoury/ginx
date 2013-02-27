@@ -1,38 +1,55 @@
 nginxparser
 ===================
 
-(C) Aziz Khoury 2013, Licensed under the MIT-LICENSE
 nginxparser is an Nginx log parser written in Javascript.
 
 API
 ---
  
-LogParser
+GinxParser
 ---------
 	
-#Parse#
+#Parser#
 
-##parser.parseLine(line, callback)##
+##parser.parseLine(line, rowCallback)##
 
-Parse a one line string
-* return: result or callback(err, result), if callback function is passed
+Parse one line string
 * Arguments
 	* line - a string representing the line to be parsed
 	* callback(err, result) - a callback function with the error if any, and the result array
 
 
-##parser.parseFile(filename)##
+##parser.parseFile(filename, cursor, rowCallback, fileCallback)##
 
 Parse a file
-* return: boolean. true if no errors, false otherwise
 * Arguments
 	* filename - a string representing the file to be parsed
-	
+	* cursor - optional, is the cursor where the parser left off before crash/stop
+	* rowCallback(err, row) - a callback function for each row's end of parse, with the error if any, and the result array
+	* fileCallback(file) - a callback function for file's end of parse
+
+##parser.parseDir(directory, rowCallback, fileCallback)##
+
+	Parse all parsable files in the first level of a directory
+	* Arguments
+		* directory - a string representing the directory that has the files to be parsed
+		* rowCallback(err, row) - a callback function for each row's end of parse, with the error if any, and the result array
+		* fileCallback(file) - a callback function for file's end of parse
+
 
 EXAMPLE USAGE
 -------------
 
-	var nparser = require("./lib/ginxparser");
+	var GinxParser = require("./lib/ginxparser");
+	var parser = new GinxParser();
 	
 	//example read from file
-	nparser.parseFile("sample.log");
+	nparser.parseFile("nginx_prod.log", 	
+	  function(err, row){
+		  if (err) throw err;
+		  console.log(row);
+	  },	  
+	  function(file){
+		 console.log(file + " parsing complete");
+	  }
+	);
