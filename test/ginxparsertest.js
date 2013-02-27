@@ -16,11 +16,12 @@
 //TEST HELPER FUNCTIONS
 
 GinxParserTest.prototype.setupTest = function(count,logSize, callback){
-  var dir = './test/tmplogs';
+  var dir = path.normalize('./test/tmplogs');
   var that = this;
   fs.remove(dir, function(){
     fs.mkdirs(dir, function(){
      that.copyLogFiles(count, logSize, callback);
+     that.emptyTmpStorage(path.normalize('./tmp'));
     });
   });
 };
@@ -51,5 +52,15 @@ GinxParserTest.prototype.copySmallLogs = function(n, callback){
 }
 GinxParserTest.prototype.copyLargeLogs = function(n, callback){
   this.copyFileMultipleToTmpLogs(n, this.defaultOrgLargeLog, callback);
+}
+GinxParserTest.prototype.emptyTmpStorage = function(dir, callback){
+  fs.remove(dir, function(){
+    console.log("removed " + dir);
+    fs.mkdirs(dir, function(){
+      if(typeof callback === 'function'){
+        callback(dir);
+      }
+    });
+  });
 }
 module.exports = GinxParserTest;

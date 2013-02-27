@@ -19,12 +19,11 @@ Parse one line string
 	* callback(err, result) - a callback function with the error if any, and the result array
 
 
-##parser.parseFile(filename, cursor, rowCallback, fileCallback)##
+##parser.parseFile(filename, rowCallback, fileCallback)##
 
 Parse a file
 * Arguments
 	* filename - a string representing the file to be parsed
-	* cursor - optional, is the cursor where the parser left off before crash/stop
 	* rowCallback(err, row) - a callback function for each row's end of parse, with the error if any, and the result array
 	* fileCallback(file) - a callback function for file's end of parse
 
