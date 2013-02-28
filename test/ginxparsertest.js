@@ -24,6 +24,8 @@ GinxParserTest.prototype.setupTest = function(count, logSize, delPrevStorage, ca
      that.copyLogFiles(count, logSize, function(doneCp){
        if(typeof delPrevStorage === 'boolean' && delPrevStorage){
          that.emptyTmpStorage(path.join(__dirname,'/../tmp'), callback);
+       } else {
+         callback(dir);
        }
      });
     });

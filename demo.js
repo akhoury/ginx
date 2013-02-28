@@ -12,6 +12,8 @@
  */
  var GinxParserTest = require('./test/ginxparsertest')
  var parserTest = new GinxParserTest();
+ // give it a try 
+ // setupTest(NumberOfFilesToCreateThenParse, file's size => 'large'(~20k lines) or 'small' (~50 lines) or 'tiny'(~10 lines), DeleteTheStorageBefore?, cb)
  parserTest.setupTest(2, 'tiny', true, function(){
 	 console.log("[GINXPARSER-TEST] finished SetupTest - Parsing begins now");
 	
@@ -34,15 +36,17 @@
 			 */
 			 	console.log(row);
 			
-			 /* Here's a sample one row output, the attributes may change depending on the format, except __file */			 
+			 /* Here's a sample one row output, the attributes may change depending on the format, except __file, __lastCharAt and __originalText */			 
 //			  { __file: '/Users/akhoury/code/ginxparser/test/tmplogs/_large_nginx1.log',
+//          __lastCharAt: 1786,
+//          __originalText: '10.100.9.92 - - [12/Nov/2012:12:15:69 -0500] "GET /assets/application-b3c5eeba998a57a7440394ae2ef6f6df.css HTTP/1.1" 200 111128 "http://demonet.trll.co/users/sign_in" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"',
 //         remote_addr: '172.28.0.104',
-//         remote_user: '-',
+//         remote_user: null,
 //         time_local: Thu Feb 21 2013 09:10:57 GMT-0500 (EST),
 //         request: 'GET /favicon.ico HTTP/1.1',
 //         status: '502',
 //         body_bytes_sent: '172',
-//         http_referer: '-',
+//         http_referer: null,
 //         http_user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:19.0) Gecko/20100101 Firefox/19.0' 
 //        }
     				
