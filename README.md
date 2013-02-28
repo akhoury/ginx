@@ -1,7 +1,7 @@
-nginxparser
+Ginxparser
 ===================
 
-nginxparser is an Nginx log parser written in Javascript - It can persist cursors of each file, to continue where it left off in case of a
+Ginxparser is an Nginx log parser written in Javascript - It can persist cursors of each file, to continue where it left off in case of a
 shutdown, unexpected exception or Ctrl+D
 
 //TODO create a command line tool with tail -f feature, along with verbose flag
@@ -15,6 +15,7 @@ shutdown, unexpected exception or Ctrl+D
 //TODO support other encodings
 //TODO optional DEBUG param flag
 //TODO delete the storage if user chooses to run non-persistent
+//TODO increase test coverage
 
 API
 ---
