@@ -13,9 +13,9 @@ var GinxParserTest = require('./test/setup/ginxparsertest')
 var parserTest = new GinxParserTest();
 // give it a try 
 // setupTest(NumberOfFilesToCreateThenParse, file's size => 'large'(~20k lines) or 'small' (~50 lines) or 'tiny'(~10 lines), DeleteTheStorageBefore?, cb)
-parserTest.setupTest(2, 'tiny', true, function () {
+parserTest.setupTest(150, 'large', true, function () {
     console.log("[GINXPARSER-TEST] finished SetupTest - Parsing begins now");
-
+    var startTime = Date.now();
     // This is how you would use it usually, in a NodeJS program
 
     // Require the module
@@ -53,7 +53,10 @@ parserTest.setupTest(2, 'tiny', true, function () {
     },
 
     function (file) {
-        console.log("[GINXPARSER-DEBUG] " + file + " parsing completed in ParseDir()");
+      // something here
+    },   
+    function(){
+        console.log("[GINXPARSER-DEBUG] all Files parsing completed in " + (Date.now()-startTime) + " ms");
     });
 
     /**
