@@ -8,6 +8,9 @@ lib-cov
 
 pids
 tmp
-test/tmplogs
+test/tmplogs/*
+test/storage/persistent/dir/*
+test/storage/persistent/file/*
+test/storage/persistent/line/*
 npm-debug.log
 node_modules

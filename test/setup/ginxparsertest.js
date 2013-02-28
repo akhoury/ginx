@@ -1,5 +1,6 @@
-var fs = require('fs-extra'),
-    path = require('path');
+var fsx = require('fs-extra'), fs = require('fs'),
+    path = require('path'), exec = require('child_process').exec,
+    GinxParser = require(path.join(__dirname, '../../lib/ginxparser'));
 
 /**
  * GinxParserTest constructor
@@ -13,6 +14,7 @@ function GinxParserTest() {
     this.LARGE = 'large';
     this.SMALL = 'small';
     this.TINY = 'tiny';
+    this.storageTmpFile = path.join(__dirname, '/../../tmp/stored.cursors');
 }
 
 //TEST HELPER FUNCTIONS
@@ -20,13 +22,13 @@ function GinxParserTest() {
 GinxParserTest.prototype.setupTest = function (count, logSize, delPrevStorage, callback) {
     var dir = path.join(__dirname, '/../tmplogs');
     var that = this;
-    fs.remove(dir, function () {
-        fs.mkdirs(dir, function () {
+    fsx.remove(dir, function () {
+        fsx.mkdirs(dir, function () {
             that.copyLogFiles(count, logSize, function (doneCp) {
                 if (typeof delPrevStorage === 'boolean' && delPrevStorage) {
-                    that.emptyTmpStorage(path.join(__dirname, '/../../tmp'), callback);
+                    that.emptyTmpStorage(callback);
                 } else {
-                    callback(dir);
+                    callback();
                 }
             });
         });
@@ -49,7 +51,7 @@ GinxParserTest.prototype.copyFileMultipleToTmpLogs = function (nbCopies, file, p
         that = this;
     if (nbCopies > 0) {
         trgFile = path.join(this.defaultTmpLogsDir, '_' + pre + '_' + 'nginx' + nbCopies + '.log');
-        fs.copy(file, trgFile, function (err) {
+        fsx.copy(file, trgFile, function (err) {
             if (err) throw err
             console.log("[GINXPARSER-TEST] copied " + file + " to: " + trgFile);
             that.copyFileMultipleToTmpLogs(nbCopies - 1, file, pre, callback);
@@ -59,14 +61,13 @@ GinxParserTest.prototype.copyFileMultipleToTmpLogs = function (nbCopies, file, p
         callback(true)
     }
 }
-GinxParserTest.prototype.emptyTmpStorage = function (dir, callback) {
-    fs.remove(dir, function () {
-        console.log("[GINXPARSER-TEST] Removed " + dir + " storage directory");
-        fs.mkdirs(dir, function () {
-            if (typeof callback === 'function') {
-                callback(dir);
-            }
-        });
-    });
+GinxParserTest.prototype.emptyTmpStorage = function (callback) {
+    var that = this;
+    console.log(this.storageTmpFile);
+    fs.writeFileSync(this.storageTmpFile, "{}");// "{}", function(err){
+    console.log("[GINXPARSER-TEST] Emptied " + that.storageTmpFile + " storage file");
+    callback();
+   //  });
 }
+
 module.exports = GinxParserTest;
