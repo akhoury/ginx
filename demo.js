@@ -27,55 +27,55 @@ parserTest.setupTest(150, 'large', true, function () {
 
     parser.parseDir("/Users/akhoury/code/ginxparser/test/tmplogs",
 
-    function (err, row) {
-        if (err) throw err;
-        /* 
-         * uncomment on your own risk :P - this will print out every row after it gets parsed, and it has a performance hit.
-         * usually these would be persisted to a database, or handled in an analysis, or search
-         * I would change the setupTest to parse 2 or 3 tiny files if you don't want to fill up your terminal before uncommenting.
+        function (err, row) {
+            if (err) throw err;
+            /* 
+             * uncomment on your own risk :P - this will print out every row after it gets parsed, and it has a performance hit.
+             * usually these would be persisted to a database, or handled in an analysis, or search
+             * I would change the setupTest to parse 2 or 3 tiny files if you don't want to fill up your terminal before uncommenting.
+             */
+              //console.log(row);
+
+            /* Here's a sample one row output, the attributes may change depending on the format, except __file, __lastCharAt and __originalText */
+            //			  { __file: '/Users/akhoury/code/ginxparser/test/tmplogs/_large_nginx1.log',
+            //          __lastCharAt: 1786,
+            //          __originalText: '10.100.9.92 - - [12/Nov/2012:12:15:69 -0500] "GET /assets/application-b3c5eeba998a57a7440394ae2ef6f6df.css HTTP/1.1" 200 111128 "http://demonet.trll.co/users/sign_in" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"',
+            //         remote_addr: '172.28.0.104',
+            //         remote_user: null,
+            //         time_local: Thu Feb 21 2013 09:10:57 GMT-0500 (EST),
+            //         request: 'GET /favicon.ico HTTP/1.1',
+            //         status: '502',
+            //         body_bytes_sent: '172',
+            //         http_referer: null,
+            //         http_user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:19.0) Gecko/20100101 Firefox/19.0' 
+            //        }
+
+            },
+
+        function (file) {
+          // something here
+        },   
+        function(){
+            console.log("[GINXPARSER-DEBUG] all Files parsing completed in " + (Date.now()-startTime) + " ms");
+        });
+
+        /**
+         * parses a single log file
+         * first callback prints out each row as it gets parsed
+         * second callback prints out the file when it's completely parsed
          */
-        //console.log(row);
-
-        /* Here's a sample one row output, the attributes may change depending on the format, except __file, __lastCharAt and __originalText */
-        //			  { __file: '/Users/akhoury/code/ginxparser/test/tmplogs/_large_nginx1.log',
-        //          __lastCharAt: 1786,
-        //          __originalText: '10.100.9.92 - - [12/Nov/2012:12:15:69 -0500] "GET /assets/application-b3c5eeba998a57a7440394ae2ef6f6df.css HTTP/1.1" 200 111128 "http://demonet.trll.co/users/sign_in" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"',
-        //         remote_addr: '172.28.0.104',
-        //         remote_user: null,
-        //         time_local: Thu Feb 21 2013 09:10:57 GMT-0500 (EST),
-        //         request: 'GET /favicon.ico HTTP/1.1',
-        //         status: '502',
-        //         body_bytes_sent: '172',
-        //         http_referer: null,
-        //         http_user_agent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:19.0) Gecko/20100101 Firefox/19.0' 
-        //        }
-
-    },
-
-    function (file) {
-      // something here
-    },   
-    function(){
-        console.log("[GINXPARSER-DEBUG] all Files parsing completed in " + (Date.now()-startTime) + " ms");
-    });
-
-    /**
-     * parses a single log file
-     * first callback prints out each row as it gets parsed
-     * second callback prints out the file when it's completely parsed
-     */
-    //		parser.parseFile("./test/logs/nginx_prod-tiny.log", 
-    //			function (err, row) {
-    //				if (err) {throw err;}
-    //				/* 
-    //					uncomment on your own risk - this will print out every row, 
-    //					usually these would be persisted to the database, or handled in an analysis, or search
-    //				*/
-    //				 //console.log(row);
-    //				},
-    //			function(file){
-    //			 console.log("[DEBUG] " + file + " parsing completed in ParseFile()");
-    //			}
-    //		);	
+        //		parser.parseFile("./test/logs/nginx_prod-tiny.log", 
+        //			function (err, row) {
+        //				if (err) {throw err;}
+        //				/* 
+        //					uncomment on your own risk - this will print out every row, 
+        //					usually these would be persisted to the database, or handled in an analysis, or search
+        //				*/
+        //				 //console.log(row);
+        //				},
+        //			function(file){
+        //			 console.log("[DEBUG] " + file + " parsing completed in ParseFile()");
+        //			}
+        //		);	
 
 });
