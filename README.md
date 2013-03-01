@@ -25,30 +25,32 @@ GinxParser
 	
 #Parser#
 
-##parser.parseLine(line, rowCallback)##
+##parser.parseLine(line, rowCallback, [filepath])##
 
 Parse one line string
 * Arguments
 	* line - a string representing the line to be parsed
 	* callback(err, row) - a callback function with the error if any, and the result row object which may contain custom attributes parsed from the format
-	Also, the result object has three attributes __file which is the file parsed from, and __lastCharAt which is this row's last character's position in the original file, and __originalText which the original text before parsing.
+	Also, the result object has three attributes __file which is the file parsed from, and __originalText which the original text before parsing.
 
 
-##parser.parseFile(filename, rowCallback, fileCallback)##
+##parser.parseFile(filename, rowCallback, fileCallback, dirCallback)##
 
 Parse a file
 * Arguments
 	* filename - a string representing the file to be parsed
 	* rowCallback(err, row) - a callback function for each row's end of parse, with the error if any, and the result row object
 	* fileCallback(file) - a callback function for file's end of parse
+	* dirCallback(dir) - an Optional callback function for Dir's end of parse, if any
 
-##parser.parseDir(directory, rowCallback, fileCallback)##
+##parser.parseDir(directory, rowCallback, fileCallback, dirCallback)##
 
 	Parse all parsable files in the first level of a directory
 	* Arguments
 		* directory - a string representing the directory that has the files to be parsed
 		* rowCallback(err, row) - a callback function for each row's end of parse, with the error if any, and the result row object
 		* fileCallback(file) - a callback function for file's end of parse
+		* dirCallback(dir) - a callback function for Dir's end of parse
 
 INSTALL
 -------
