@@ -1,11 +1,14 @@
-var fsx = require('fs-extra'), fs = require('fs'),
-    path = require('path'), exec = require('child_process').exec,
+var fsx = require('fs-extra'),
+    fs = require('fs'),
+    path = require('path'),
+    exec = require('child_process').exec,
     GinxParser = require(path.join(__dirname, '../../lib/ginxparser'));
 
 /**
  * GinxParserTest constructor
  *   
  */
+
 function GinxParserTest() {
     this.defaultOrgTinyLog = path.join(__dirname, '/../logs/nginx_prod-tiny.log');
     this.defaultOrgSmallLog = path.join(__dirname, '/../logs/nginx_prod-small.log');
@@ -18,7 +21,6 @@ function GinxParserTest() {
 }
 
 //TEST HELPER FUNCTIONS
-
 GinxParserTest.prototype.setupTest = function (count, logSize, delPrevStorage, callback) {
     var dir = path.join(__dirname, '/../tmplogs');
     var that = this;
@@ -52,7 +54,9 @@ GinxParserTest.prototype.copyFileMultipleToTmpLogs = function (nbCopies, file, p
     if (nbCopies > 0) {
         trgFile = path.join(this.defaultTmpLogsDir, '_' + pre + '_' + 'nginx' + nbCopies + '.log');
         fsx.copy(file, trgFile, function (err) {
-            if (err){throw err;}
+            if (err) {
+                throw err;
+            }
             console.log("[GINXPARSER-TEST] copied " + file + " to: " + trgFile);
             that.copyFileMultipleToTmpLogs(nbCopies - 1, file, pre, callback);
         });
@@ -63,10 +67,10 @@ GinxParserTest.prototype.copyFileMultipleToTmpLogs = function (nbCopies, file, p
 }
 GinxParserTest.prototype.emptyTmpStorage = function (callback) {
     var that = this;
-    fs.writeFileSync(that.storageTmpFile, "{}");// "{}", function(err){
+    fs.writeFileSync(that.storageTmpFile, "{}"); // "{}", function(err){
     console.log("[GINXPARSER-TEST] Emptied " + that.storageTmpFile + " storage file");
     callback();
-   //  });
+    //  });
 }
 
 module.exports = GinxParserTest;
