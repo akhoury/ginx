@@ -7,13 +7,13 @@
  *  and since I need to wait for these the files to be copied before I actually start parsing, I pass the parsing code in a callback anon function
  * 
  *  One more note, the setupTest does delete the storage before running, if you don't want to do so, pass it a 'false' in the  3rd argument.
- *  currently the program does not delete the storage (tmp/*) for you,
+ *  currently a normal program run does not delete the storage (default in tmp/*) for you,
  */
 var GinxParserTest = require('./test/setup/ginxparsertest'), fs = require('fs');
-var parserTest = new GinxParserTest();
+var parserTestHelper = new GinxParserTest();
 // give it a try 
 // setupTest(NumberOfFilesToCreateThenParse, file's size => 'large'(~20k lines) or 'small' (~50 lines) or 'tiny'(~10 lines), DeleteTheStorageBefore?, cb)
-parserTest.setupTest(30, 'large', true, function () {
+parserTestHelper.setupTest(30, 'large', true, function () {
     console.log("[GINXPARSER-TEST] finished SetupTest - Parsing begins now");
     var startTime = Date.now();
     // This is how you would use it usually, in a NodeJS program

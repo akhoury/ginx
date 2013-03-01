@@ -7,7 +7,7 @@ lib-cov
 *.gz
 
 pids
-tmp
+tmp/*
 test/tmplogs/*
 test/storage/persistent/dir/*
 test/storage/persistent/file/*

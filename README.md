@@ -15,7 +15,7 @@ shutdown, unexpected exception or Ctrl+D
 * TODO support other encodings
 * TODO optional DEBUG param flag
 * TODO delete the storage if user chooses to run non-persistent
-* TODO increase test coverage
+* TODO increase test coverage, seriously
 
 API
 ---
