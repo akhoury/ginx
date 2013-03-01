@@ -25,16 +25,17 @@ GinxParser
 	
 #Parser#
 
-##parser.parseLine(line, rowCallback, [filepath])##
+##parser.parseLine(line, rowCallback, filepath)##
 
 Parse one line string
 * Arguments
 	* line - a string representing the line to be parsed
 	* callback(err, row) - a callback function with the error if any, and the result row object which may contain custom attributes parsed from the format
 	Also, the result object has three attributes __file which is the file parsed from, and __originalText which the original text before parsing.
+	* filepath - optional, used internally
 
 
-##parser.parseFile(filename, rowCallback, fileCallback, dirCallback)##
+##parser.parseFile(filename, rowCallback, fileCallback, dirCallback, isPool)##
 
 Parse a file
 * Arguments
@@ -42,6 +43,7 @@ Parse a file
 	* rowCallback(err, row) - a callback function for each row's end of parse, with the error if any, and the result row object
 	* fileCallback(file) - a callback function for file's end of parse
 	* dirCallback(dir) - an Optional callback function for Dir's end of parse, if any
+	* isPool, used internally
 
 ##parser.parseDir(directory, rowCallback, fileCallback, dirCallback)##
 
@@ -64,13 +66,18 @@ EXAMPLE USAGE
 -------------
 
 	var GinxParser = require("./lib/ginxparser");
+	
+	// optionally you can pass in two arguments, a the format as a String of the the Nginx access_log format, and an options object {'persistent': true, 'fieldsToObjects': true} 
+  // default is {'persistent': true, 'fieldsToObjects': true} and the default Nginx access_log, check ./lib/ginxparser.js source to see the default format
+  // fieldsToObjects when true, it will try to convert each column's value to it's corresponding objects, so far i only parse dates to Date,  numbers to Number,and every '-' to null 
+  // turning that off will impact performance positively as well, but of course everything depends on what you're trying to do with the logs,
 	var parser = new GinxParser();
 	
 	//example read from file
 	nparser.parseFile("nginx_prod.log", 	
 	  function(err, row){
 		  if (err) throw err;
-		  console.log(row);
+		  console.log("this will print each parsed line:" + row);
 	  },	  
 	  function(file){
 		 console.log(file + " parsing complete");

@@ -10,28 +10,33 @@
  *  currently a normal program run does not delete the storage (default in tmp/*) for you,
  */
 var GinxParserTest = require('./test/setup/ginxparsertest'),
-    fs = require('fs');
+    fs = require('fs'),
+    path = require('path');
 var parserTestHelper = new GinxParserTest();
 // give it a try 
 // setupTest(NumberOfFilesToCreateThenParse, file's size => 'large'(~20k lines) or 'small' (~50 lines) or 'tiny'(~10 lines), DeleteTheStorageBefore?, cb)
-parserTestHelper.setupTest(100, 'large', true, function () {
-    console.log("[GINXPARSER-TEST] finished SetupTest - Parsing begins now");
+parserTestHelper.setupTest(1, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS IF YOU WANT TO TRY THE PERSISTENCE*/, function () {
+    console.log("[GINXPARSER-DEBUG-DEMO] finished SetupTest - Parsing begins now");
     var startTime = Date.now();
     // This is how you would use it usually, in a NodeJS program
     // Require the module
     var GinxParser = require('./lib/ginxparser'); // OR require('ginxparser'), depends how and where you isntalled it
     //construct a parser object, 
-    // optionally you can pass in two arguments, a boolean (persistent or not) and a string the Nginx access_log format. 
-    // default is Persistent, and the default Nginx access_log, check ./lib/ginxparser.js source to see the default format
-    var parser = new GinxParser();
-
-    parser.parseDir("/Users/akhoury/code/ginxparser/test/tmplogs",
+    // optionally you can pass in two arguments, a the format as a String of the the Nginx access_log format, and an options object {'persistent': true, 'fieldsToObjects': true} 
+    // default is {'persistent': true, 'fieldsToObjects': false} and the default Nginx access_log, check ./lib/ginxparser.js source to see the default format
+    // fieldsToObjects when true, it will try to convert each column's value to it's corresponding objects, so far i only parse dates to Date,  numbers to Number,and every '-' to null 
+    // turning that to False will impact performance positevly as well, but of course everything depends on what you're trying to do with the logs, 
+    var parser = new GinxParser({'persistent': true, 'fieldsToObjects': false});
+    
+//UNCOMMENT THIS BLOCK, COMMENT THE ONE BELOW, to try out parseDir()    
+///* 
+    parser.parseDir(path.join(__dirname, "/./test/tmplogs"),
     function (err, row) {
         if (err) throw err;
         //uncomment on your own risk :P - this will print out every row after it gets parsed, and it has a performance hit.
         //usually these would be persisted to a database, or handled in an analysis, or search
         //I would change the setupTest to parse 2 or 3 tiny files if you don't want to fill up your terminal before uncommenting.             
-        //console.log(row);
+        //console.log("[GINXPARSER-DEBUG-DEMO] " + row);
         
         // Here's a sample one row output, the attributes may change depending on the format, except __file and __originalText
         //		  { __file: '/Users/akhoury/code/ginxparser/test/tmplogs/_large_nginx1.log',
@@ -50,15 +55,21 @@ parserTestHelper.setupTest(100, 'large', true, function () {
     function (file) {
         // something here
     }, function () {
-        console.log("[GINXPARSER-DEBUG] all Files parsing completed in " + (Date.now() - startTime) + " ms");
+        console.log("[GINXPARSER-DEBUG-DEMO] all Files parsing completed in " + (Date.now() - startTime) + " ms");
     });
+/// BLOCK ENDS HERE 	
+
+//*/
 
     /**
      * parses a single log file
      * first callback prints out each row as it gets parsed
      * second callback prints out the file when it's completely parsed
      */
-/*	parser.parseFile("./test/logs/nginx_prod-enourmous.log", 
+//UNCOMMENT THIS BLOCK, COMMENT THE ONE ABOVE, to try out parseFile()    
+/*     // IF YOU WANT TO ONLY RUN THIS TEST parseFile (a single file) change the first param in setupTest to 0 - so you won't have to wait for it to create mock files
+	parser.parseFile(path.join(__dirname, "/./test/logs/nginx_prod-large.log"), 
+	//parser.parseFile("/Users/akhoury/.Trash/nginx_prod-enourmous.log",
 		function (err, row) {
 			if (err) {throw err;}
 			 
@@ -68,8 +79,9 @@ parserTestHelper.setupTest(100, 'large', true, function () {
 			 //console.log(row);
 			},
 		function(file){
-		 console.log("[DEBUG] " + file + " parsing completed in " + (Date.now()-startTime));
+		 console.log("[GINXPARSER-DEBUG-DEMO] " + file + " parsing completed in " + (Date.now()-startTime) + " ms");
 		}
 	);
-*/	
+*/
+/// BLOCK ENDS HERE 	
 });
