@@ -41,8 +41,8 @@ Parse a file
 * Arguments
 	* filename - a string representing the file to be parsed
 	* rowCallback(err, row) - a callback function for each row's end of parse, with the error if any, and the result row object
-	* fileCallback(file) - a callback function for file's end of parse
-	* dirCallback(dir) - an Optional callback function for Dir's end of parse, if any
+	* fileCallback(err, file) - a callback function for file's end of parse
+	* dirCallback(err) - an Optional callback function for Dir's end of parse, if any
 	* isPool, used internally
 
 ##parser.parseDir(directory, rowCallback, fileCallback, dirCallback)##
@@ -51,8 +51,8 @@ Parse a file
 	* Arguments
 		* directory - a string representing the directory that has the files to be parsed
 		* rowCallback(err, row) - a callback function for each row's end of parse, with the error if any, and the result row object
-		* fileCallback(file) - a callback function for file's end of parse
-		* dirCallback(dir) - a callback function for Dir's end of parse
+		* fileCallback(err, file) - a callback function for file's end of parse
+		* dirCallback(err) - a callback function for Dir's end of parse
 
 INSTALL
 -------
@@ -79,7 +79,8 @@ EXAMPLE USAGE
 		  if (err) throw err;
 		  console.log("this will print each parsed line:" + row);
 	  },	  
-	  function(file){
+	  function(err, file){
+		if (err) throw err;
 		 console.log(file + " parsing complete");
 	  }
 	);

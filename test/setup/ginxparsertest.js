@@ -24,7 +24,7 @@ function GinxParserTest() {
 GinxParserTest.prototype.setupTest = function (count, logSize, delPrevStorage, callback) {
     var dir = path.join(__dirname, '/../tmplogs');
     var that = this;
-    fsx.remove(dir, function () {
+    fsx.remove(dir, function (err) {
         fsx.mkdirs(dir, function () {
             that.copyLogFiles(count, logSize, function (doneCp) {
                 if (typeof delPrevStorage === 'boolean' && delPrevStorage) {
@@ -65,11 +65,11 @@ GinxParserTest.prototype.copyFileMultipleToTmpLogs = function (nbCopies, file, p
         callback(true)
     }
 }
-GinxParserTest.prototype.emptyTmpStorage = function (callback) {
+GinxParserTest.prototype.emptyTmpStorage = function (callback, file) {
     var that = this;
-    fs.writeFileSync(that.storageTmpFile, "{}"); // "{}", function(err){
+    fs.writeFileSync(file ? file : that.storageTmpFile, "{}"); // "{}", function(err){
     console.log("[GINXPARSER-TEST] Emptied " + that.storageTmpFile + " storage file");
-    callback();
+    callback(that.storageTmpFile);
     //  });
 }
 
