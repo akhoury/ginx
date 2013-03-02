@@ -14,7 +14,7 @@ var fs = require('fs'),
     Helper = require(path.join(__dirname, '/test/setup/helper')),
     testHelper = new Helper();
     
-require('v8-profiler');
+//require('v8-profiler');
 
 // give it a try 
 // setupTest(NumberOfFilesToCreateThenParse, file's sizes => 'large'(~20k lines) or 'small' (~50 lines) or 'tiny'(~10 lines), DeleteTheStorageBefore?, cb)
