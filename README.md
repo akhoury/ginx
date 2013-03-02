@@ -25,12 +25,12 @@ API
 GinxParser
 ---------
 	
-##GinxParser(format, {'persistent': true, 'fieldsToObjects': false})##
+##GinxParser(format, {options})##
 
 Construct a 'new GinxParser();
 * Arguments
 	* format - Optional string representing the Nginx access_log format, usually in your nginx conf, check ./lib/ginxparser.js source to see the default format if you don't pass any.
-	* Object - Optional hash that may contain two key:value pairs
+	* {Options} - Optional hash that may contain two key:value pairs - default {'persistent': true, 'fieldsToObjects': false}
 	  * 'persistent' defaults to true, whether your program will persist file positions to a local file in ./tmp/stored.cursors
 	  * 'fieldsToObjects' defaults to false, whether the program will attempt to parse every column to its corresponding object, i.e Date, Number, or Null - if turned to True, it may impact the performance depending on Number and Size of files getting parsed.
 
