@@ -72,13 +72,7 @@ EXAMPLE USAGE
 -------------
 
 	var GinxParser = require("./lib/ginxparser");
-	
-	// optionally you can pass in two arguments, a the format as a String of the the Nginx access_log format, and an options object {'persistent': true, 'fieldsToObjects': true} 
-  // default is {'persistent': true, 'fieldsToObjects': true} and the default Nginx access_log, check ./lib/ginxparser.js source to see the default format
-  // fieldsToObjects when true, it will try to convert each column's value to it's corresponding objects, so far i only parse dates to Date,  numbers to Number,and every '-' to null 
-  // turning that off will impact performance positively as well, but of course everything depends on what you're trying to do with the logs,
 	var parser = new GinxParser();
-	
 	//example read from file
 	nparser.parseFile("nginx_prod.log", 	
 	  function(err, row){
