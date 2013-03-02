@@ -18,7 +18,7 @@ var fs = require('fs'),
 
 // give it a try 
 // setupTest(NumberOfFilesToCreateThenParse, file's sizes => 'large'(~20k lines) or 'small' (~50 lines) or 'tiny'(~10 lines), DeleteTheStorageBefore?, cb)
-testHelper.setupTest(5, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS IF YOU WANT TO TRY THE PERSISTENCE*/, function () {
+testHelper.setupTest(100, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS IF YOU WANT TO TRY THE PERSISTENCE*/, function () {
     console.log("[GINXPARSER-DEBUG-DEMO] finished SetupTest - Parsing begins now");
     var startTime = Date.now();
        
@@ -43,7 +43,7 @@ testHelper.setupTest(5, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS I
             //uncomment on your own risk :P - this will print out every row after it gets parsed, and it has a performance hit.
             //usually these would be persisted to a database, or handled in an analysis, or search
             //I would change the setupTest to parse 2 or 3 'tiny' files if you don't want to fill up your terminal before uncommenting.             
-            //console.log("[GINXPARSER-DEBUG-DEMO] " + row);
+            //console.log("[GINXPARSER-DEBUG-DEMO] " + row.time_local);
         
             // Here's a sample one row output, the attributes may change depending on the format, except __file and __originalText
             //		  { __file: '/Users/akhoury/code/ginxparser/test/tmplogs/_large_nginx1.log',
@@ -61,7 +61,7 @@ testHelper.setupTest(5, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS I
             // something here
         }, function (err, filesCount) {
             console.log("[GINXPARSER-DEBUG-DEMO] " + filesCount + " Files parsing completed in " + (Date.now() - startTime) + " ms");
-            console.log("[GINXPARSER-DEBUG-DEMO] For the purpose of this demo, every run will delete then replace the previous storage before parsing, " 
+            console.log("[GINXPARSER-DEBUG-DEMO] Note: For the purpose of this demo, every run will delete then replace the previous storage before parsing, " 
                         + " if you do not wish to delete it before a demo run, set the 3rd param in testHelper.setupTest to false" 
                         + " at the top of demo.js.");
         });
