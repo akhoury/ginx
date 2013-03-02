@@ -1,13 +1,13 @@
 /**
  * ======README PLEASE====
  * 
- * I use the GinxParserTest ==> FOR DEMO PURPOSES ONLY <=== to create N extact copies of log files in 
- *	 ./test/tmplogs from either ./test/logs/nginx_prod-[large|small|tiny].log, so I won't have to commit all sample logs,
+ * I use the /test/setup/helper ==> FOR DEMO PURPOSES ONLY <=== to create N extact copies of log files in 
+ *	 ./test/tmplogs from either ./test/logs/nginx_prod-[large|small|tiny].log, so I won't have to commit a lot sample logs,
  *  you will usually have your own log files
  *  and since I need to wait for these the files to be copied before I actually start parsing, I pass the parsing code in a callback anon function
  * 
- *  One more note, the setupTest does delete the storage before running, if you don't want to do so, pass it a 'false' in the  3rd argument.
- *  currently a normal program run does not delete the storage (default in tmp/*) for you,
+ *  One more note, the setupTest does deletes the storage before running, if you do not wish to do so, pass it a 'false' in the  3rd argument.
+ *  currently a normal program run does not delete the storage for you, (default storage in ./tmp/*) 
  */
 var fs = require('fs'),
     path = require('path'),
