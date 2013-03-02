@@ -61,7 +61,7 @@ testHelper.setupTest(100, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS
             // something here
         }, function (err, filesCount) {
             console.log("[GINXPARSER-DEBUG-DEMO] " + filesCount + " Files parsing completed in " + (Date.now() - startTime) + " ms");
-            console.log("[GINXPARSER-DEBUG-DEMO] Note: For the purpose of this demo, every run will delete then replace the previous storage before parsing, " 
+            console.info("[GINXPARSER-DEBUG-DEMO] Note: For the purpose of this demo, every run will delete then replace the previous storage before parsing, " 
                         + " if you do not wish to delete it before a demo run, set the 3rd param in testHelper.setupTest to false" 
                         + " at the top of demo.js.");
         });

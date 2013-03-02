@@ -2,23 +2,23 @@ var assert = require('assert'),
     path = require('path'),     
     GinxParser = require(path.join(__dirname, './../lib/ginxparser')),
     Helper = require(path.join(__dirname, './setup/helper')), 
-    testHelper, parser;
+    testHelper, parser, count, storageFile = path.join(__dirname, '/storage/persistent/file/cursors.json'); 
     
 testHelper = new Helper();
-parser = new GinxParser({'persistent': true, 'fieldsToObjects': true});
+parser = new GinxParser({'persistent': true, 'fieldsToObjects': true, 'storageFile':storageFile});
 
 
 before(function(done) {
-    testHelper.setupTest(30, 'large', true, function (file) {
+    count = 30;
+    testHelper.storageTmpFile = storageFile;
+    testHelper.setupTest(count, 'small', true, function (file) {
         console.log("[GINXPARSER-TEST][PARSEDIR] before setup done");
-        parser.__mem.tmpStorageFile = file;
         done();
-    });
+    }, storageFile);
 });
 describe('.parseDir ', function (done) {
-    it('should parse a directory of nginx logs 30 "large" file: ~16k lines each, totals 477600 rows, '
-        + ' and store their cursor values, 30 cursor records'
-        + '\n [GINXPARSER-NOTE]: this test will copy 30 files to a tmp dir before parsing, so it is a little slower.\n', function (done) {
+    it('should parse a directory of nginx logs 30 "small" file: 50 lines each, totals 1500 rows, '
+        + ' and store their cursor values, 30 cursor records', function (done) {
         var counter = 0,
         dir = path.join(__dirname, "/tmplogs");
         parser.parseDir(dir,
@@ -37,15 +37,19 @@ describe('.parseDir ', function (done) {
             },
 
             function (err, filesCount) {
-                assert.equal(477600, counter);
+                assert.equal(1500, counter);
                 assert.equal(30, filesCount);
                 done();
             });
         });
 });
 after(function(done) {
-    testHelper.emptyTmpStorage(function () {
-        console.log("[GINXPARSER-TEST][PARSEDIR] After test, deleting storage");
+    //testHelper.emptyTmpStorage(storageFile, function () {
+        //console.log("[GINXPARSER-TEST] After test, deleting storage");       
+        console.warn("[GINXPARSER-TEST] NOTE: ParseDir() test copies " + count + " files to a tmp dir before parsing, "
+                     + "it maybe a little slower, depending on file size"
+                     + "\n[IMPORTANT] Since Mocha have a 2000 ms timeout for each test, you can't use it to test very large"
+                     + "file or too many files, these have to be done outside of mocha's suite, play around with demo.js using helper.js you can do magic in there.");
         done();
-    });
+  // });
 });

@@ -3,15 +3,14 @@ var assert = require('assert'),
     fs = require('fs'),
     GinxParser = require(path.join(__dirname, './../lib/ginxparser')),
     Helper = require(path.join(__dirname, './setup/helper')),
-    testHelper, parser, data; 
+    testHelper, parser, data, storageFile = path.join(__dirname, '/storage/persistent/line/cursors.json');
 
 before(function(done) {
-    parser = new GinxParser({'persistent':true});
+    parser = new GinxParser({'persistent':true,'storageFile': storageFile});
     testHelper = new Helper();
-    testHelper.storageTmpFile = path.join(__dirname, '/storage/persistent/file/cursors.json');
-    parser.__mem.tmpStorageFile = testHelper.storageTmpFile;
-    testHelper.emptyTmpStorage(function () {
-    done();
+    testHelper.storageTmpFile = storageFile;
+    testHelper.emptyTmpStorage(storageFile, function () {
+        done();
     });
 });
 
@@ -38,7 +37,7 @@ describe('.parseLine ', function (done) {
             assert.equal(__file, row['__file']);
             assert.equal(__originalText, row['__originalText']);
             done();
-        },__file);
+        },{'file':__file});
     });
 });
 

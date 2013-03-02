@@ -7,11 +7,10 @@ shutdown, unexpected exception or Ctrl+D, all that with the option of parsing a 
 ##TODO##
 
 * create a command line tool with tail -f feature, along with verbose flag
-* allow user to set storage file path
 * add Stop, Pause, Resume to the API 
 * add auto detection feature for the format based on an example log line.
 * add support for Error logs
-* use a logger with different levels (info, error, warning, debug, trace)
+* log with different levels (info, error, warning, debug, trace) to an optional log file
 * use a better hashing algorithm for cursors keys
 * refactor some of the big functions
 * support other encodings
@@ -25,26 +24,28 @@ API
 GinxParser
 ---------
 	
-##GinxParser(format, {options})##
+##GinxParser(format, options={})##
 
 Construct a 'new GinxParser();
 * Arguments
 	* format - Optional string representing the Nginx access_log format, usually in your nginx conf, check ./lib/ginxparser.js source to see the default format if you don't pass any.
-	* {Options} - Optional hash that may contain two key:value pairs - default {'persistent': true, 'fieldsToObjects': false}
+	* options - Optional hash that may contain two key:value pairs - default {'persistent': true, 'fieldsToObjects': false}
 	  * 'persistent' defaults to true, whether your program will persist file positions to a local file in ./tmp/stored.cursors
 	  * 'fieldsToObjects' defaults to false, whether the program will attempt to parse every column to its corresponding object, i.e Date, Number, or Null - if turned to True, it may impact the performance depending on Number and Size of files getting parsed.
+	  * 'storageFile' defaults to ./tmp/stored.cursors, which file you want to store the cursors in
 
 
-##parser.parseLine(line, rowCallback)##
+##parser.parseLine(line, rowCallback, options={})##
 
 Parse one line string
 * Arguments
 	* line - a string representing the line to be parsed
 	* callback(err, row) - a callback function with the error if any, and the result row object which may contain custom attributes parsed from the format
 	Also, the result object has three attributes __file which is the file parsed from, and __originalText which the original text before parsing.
+	* options, optional hash, currently only supports 'file': path
 
 
-##parser.parseFile(path, rowCallback, fileCallback)##
+##parser.parseFile(path, rowCallback, fileCallback, options={})##
 
 Parse a file
 * Arguments
@@ -52,6 +53,7 @@ Parse a file
 	* rowCallback(err, row) - a callback function for each row's end of parse, with the error if any, and the result row object
 	* fileCallback(err, file) - a callback function for file's end of parse
 	* dirCallback(err) - an Optional callback function for Dir's end of parse, if any
+	* options, optional hash, currently only supports 'isPool': boolean, which is used internally to determine if this file was in the waiting pool or not, you don't need it at all if you're parsing a single file, even if you're not, parseDir will take care of that part if you're parsing multiple files.
 
 ##parser.parseDir(directory, rowCallback, fileCallback, dirCallback)##
 

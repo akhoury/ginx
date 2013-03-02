@@ -21,7 +21,7 @@ function Helper() {
 }
 
 //TEST HELPER FUNCTIONS
-Helper.prototype.setupTest = function (count, logSize, delPrevStorage, callback) {
+Helper.prototype.setupTest = function (count, logSize, delPrevStorage, callback, storageFile) {
     var dir = path.join(__dirname, '/../tmplogs');
     var that = this;
     if (count < 0) return;
@@ -29,14 +29,14 @@ Helper.prototype.setupTest = function (count, logSize, delPrevStorage, callback)
         fsx.mkdirs(dir, function () {
             if(count === 0){
                 if (typeof delPrevStorage === 'boolean' && delPrevStorage) {
-                    that.emptyTmpStorage(callback);
+                    that.emptyTmpStorage(storageFile, callback);
                 } else {
                     callback();
                 }
             } else {
                 that.copyLogFiles(count, logSize, function (doneCp) {
                     if (typeof delPrevStorage === 'boolean' && delPrevStorage) {
-                        that.emptyTmpStorage(callback);
+                        that.emptyTmpStorage(storageFile, callback);
                     } else {
                         callback();
                     }
@@ -74,12 +74,13 @@ Helper.prototype.copyFileMultipleToTmpLogs = function (nbCopies, file, pre, call
         callback(true)
     }
 }
-Helper.prototype.emptyTmpStorage = function (callback, file) {
-    var that = this;
-    fs.writeFileSync(file ? file : that.storageTmpFile, "{}"); // "{}", function(err){
-    console.log("[GINXPARSER-TEST] Emptied " + that.storageTmpFile + " storage file");
-    callback(that.storageTmpFile);
-    //  });
+Helper.prototype.emptyTmpStorage = function (file, callback) {
+    var that = this, storageFile = file ? file : that.storageTmpFile;
+    fs.writeFileSync(storageFile, "{}");//, function(err){
+        //if (err) throw err;
+    console.log("[GINXPARSER-TEST] Emptied " + storageFile + " storage file");
+    callback(storageFile);
+    //});
 }
 
 module.exports = Helper;

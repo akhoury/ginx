@@ -3,15 +3,14 @@ var assert = require('assert'),
     fs = require('fs'),
     GinxParser = require(path.join(__dirname, './../lib/ginxparser')),
     Helper = require(path.join(__dirname, './setup/helper')),
-    testHelper, parser, data; 
+    testHelper, parser, data, storageFile = path.join(__dirname, '/storage/persistent/file/cursors.json'); 
 
 before(function(done) {
-    parser = new GinxParser({'persistent':true});
+    parser = new GinxParser({'persistent':true,'storageFile': storageFile});
     testHelper = new Helper();
-    testHelper.storageTmpFile = path.join(__dirname, '/storage/persistent/file/cursors.json');
-    parser.__mem.tmpStorageFile = testHelper.storageTmpFile;
-    testHelper.emptyTmpStorage(function () {
-    done();
+    testHelper.storageTmpFile = storageFile;
+    testHelper.emptyTmpStorage(storageFile, function (file) {
+        done();
     });
 });
 
@@ -28,8 +27,9 @@ describe('.parseFile() ', function (done) {
             counter++;
         },
         function (err, file) {
+            console.log("THIS IS HAPPENING !!!");
             assert.equal(false, !!err);
-            assert.equal(15920, counter);
+            assert.equal(15920, counter, "It's probably because a tiny bug, try emptying the storage file ("+storageFile+") manually and run test again, or just run the test now");
             assert.equal("number", typeof parser.__mem.cursors[parser.getStorageKeyfromPath(file)]);
             done();
         });
