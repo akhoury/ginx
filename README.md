@@ -1,21 +1,23 @@
 Ginxparser
 ===================
 
-Ginxparser is an Nginx log parser written in Javascript - It can persist cursors of each file, to continue where it left off in case of a
-shutdown, unexpected exception or Ctrl+D
+Ginxparser is a fast Nginx log parser written in Javascript; It can persist cursors of each file, to continue where it left off in case of a
+shutdown, unexpected exception or Ctrl+D, all that with the option of parsing a directory of files instead of one file.
 
-* TODO create a command line tool with tail -f feature, along with verbose flag
-* TODO allow user to set storage file path
-* TODO add Stop, Pause, Resume to the API 
-* TODO add auto detection feature for the format based on an example log line.
-* TODO add support for Error logs
-* TODO use a logger with different levels (info, error, warning, debug, trace)
-* TODO use a better hashing algorithm for cursors keys
-* TODO refactor some of the big functions
-* TODO support other encodings
-* TODO optional DEBUG param flag
-* TODO delete the storage if user chooses to run non-persistent
-* TODO increase test coverage, seriously
+##TODO##
+
+* create a command line tool with tail -f feature, along with verbose flag
+* allow user to set storage file path
+* add Stop, Pause, Resume to the API 
+* add auto detection feature for the format based on an example log line.
+* add support for Error logs
+* use a logger with different levels (info, error, warning, debug, trace)
+* use a better hashing algorithm for cursors keys
+* refactor some of the big functions
+* support other encodings
+* optional DEBUG param flag, and input/output paths flags
+* delete the storage if user chooses to run non-persistent
+* increase test coverage, seriously
 
 API
 ---
