@@ -24,6 +24,9 @@ function GinxParserTest() {
 GinxParserTest.prototype.setupTest = function (count, logSize, delPrevStorage, callback) {
     var dir = path.join(__dirname, '/../tmplogs');
     var that = this;
+    if(count <= 0){
+        return;
+    }
     fsx.remove(dir, function (err) {
         fsx.mkdirs(dir, function () {
             that.copyLogFiles(count, logSize, function (doneCp) {

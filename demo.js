@@ -12,10 +12,10 @@
 var fs = require('fs'),
     path = require('path'),
     GinxParserTest = require(path.join(__dirname, '/test/setup/ginxparsertest')),
-var parserTestHelper = new GinxParserTest();
+    parserTestHelper = new GinxParserTest();
 // give it a try 
 // setupTest(NumberOfFilesToCreateThenParse, file's size => 'large'(~20k lines) or 'small' (~50 lines) or 'tiny'(~10 lines), DeleteTheStorageBefore?, cb)
-parserTestHelper.setupTest(0, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS IF YOU WANT TO TRY THE PERSISTENCE*/, function () {
+parserTestHelper.setupTest(60, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS IF YOU WANT TO TRY THE PERSISTENCE*/, function () {
     console.log("[GINXPARSER-DEBUG-DEMO] finished SetupTest - Parsing begins now");
     var startTime = Date.now();
     // This is how you would use it usually, in a NodeJS program
