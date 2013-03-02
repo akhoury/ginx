@@ -1,15 +1,15 @@
 var assert = require('assert'),
     path = require('path'),     
     GinxParser = require(path.join(__dirname, './../lib/ginxparser')),
-    GinxParserTest = require(path.join(__dirname, './setup/ginxparsertest')), 
-    parserTestHelper, parser;
+    Helper = require(path.join(__dirname, './setup/helper')), 
+    testHelper, parser;
     
-parserTestHelper = new GinxParserTest();
+testHelper = new Helper();
 parser = new GinxParser({'persistent': true, 'fieldsToObjects': true});
 
 
 before(function(done) {
-    parserTestHelper.setupTest(30, 'large', true, function (file) {
+    testHelper.setupTest(30, 'large', true, function (file) {
         console.log("[GINXPARSER-TEST][PARSEDIR] before setup done");
         parser.__mem.tmpStorageFile = file;
         done();
@@ -36,14 +36,15 @@ describe('.parseDir ', function (done) {
                 assert.equal("number", typeof parser.__mem.cursors[parser.getStorageKeyfromPath(file)]);
             },
 
-            function () {
+            function (err, filesCount) {
                 assert.equal(477600, counter);
+                assert.equal(30, filesCount);
                 done();
             });
         });
 });
 after(function(done) {
-    parserTestHelper.emptyTmpStorage(function () {
+    testHelper.emptyTmpStorage(function () {
         console.log("[GINXPARSER-TEST][PARSEDIR] After test, deleting storage");
         done();
     });

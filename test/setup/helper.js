@@ -5,11 +5,11 @@ var fsx = require('fs-extra'),
     GinxParser = require(path.join(__dirname, '../../lib/ginxparser'));
 
 /**
- * GinxParserTest constructor
+ * Helper constructor
  *   
  */
 
-function GinxParserTest() {
+function Helper() {
     this.defaultOrgTinyLog = path.join(__dirname, '/../logs/nginx_prod-tiny.log');
     this.defaultOrgSmallLog = path.join(__dirname, '/../logs/nginx_prod-small.log');
     this.defaultOrgLargeLog = path.join(__dirname, '/../logs/nginx_prod-large.log');
@@ -21,26 +21,32 @@ function GinxParserTest() {
 }
 
 //TEST HELPER FUNCTIONS
-GinxParserTest.prototype.setupTest = function (count, logSize, delPrevStorage, callback) {
+Helper.prototype.setupTest = function (count, logSize, delPrevStorage, callback) {
     var dir = path.join(__dirname, '/../tmplogs');
     var that = this;
-    if(count <= 0){
-        return;
-    }
+    if (count < 0) return;
     fsx.remove(dir, function (err) {
         fsx.mkdirs(dir, function () {
-            that.copyLogFiles(count, logSize, function (doneCp) {
+            if(count === 0){
                 if (typeof delPrevStorage === 'boolean' && delPrevStorage) {
                     that.emptyTmpStorage(callback);
                 } else {
                     callback();
                 }
-            });
+            } else {
+                that.copyLogFiles(count, logSize, function (doneCp) {
+                    if (typeof delPrevStorage === 'boolean' && delPrevStorage) {
+                        that.emptyTmpStorage(callback);
+                    } else {
+                        callback();
+                    }
+                });
+            }
         });
     });
 };
-GinxParserTest.prototype.copyLogFiles = function (n, size, callback) {
-    console.log("[GINXPARSER-TEST] copying of " + n + " " + size + " log file(s) started");
+Helper.prototype.copyLogFiles = function (n, size, callback) {
+    console.log("[GINXPARSER-TEST] COPYING " + n + " " + size + " log file(s) started");
     var file, pre;
     if (size === this.TINY) {
         file = this.defaultOrgTinyLog;
@@ -51,7 +57,7 @@ GinxParserTest.prototype.copyLogFiles = function (n, size, callback) {
     }
     this.copyFileMultipleToTmpLogs(n, file, size, callback);
 };
-GinxParserTest.prototype.copyFileMultipleToTmpLogs = function (nbCopies, file, pre, callback) {
+Helper.prototype.copyFileMultipleToTmpLogs = function (nbCopies, file, pre, callback) {
     var trgFile, srcFile = file,
         that = this;
     if (nbCopies > 0) {
@@ -68,7 +74,7 @@ GinxParserTest.prototype.copyFileMultipleToTmpLogs = function (nbCopies, file, p
         callback(true)
     }
 }
-GinxParserTest.prototype.emptyTmpStorage = function (callback, file) {
+Helper.prototype.emptyTmpStorage = function (callback, file) {
     var that = this;
     fs.writeFileSync(file ? file : that.storageTmpFile, "{}"); // "{}", function(err){
     console.log("[GINXPARSER-TEST] Emptied " + that.storageTmpFile + " storage file");
@@ -76,4 +82,4 @@ GinxParserTest.prototype.emptyTmpStorage = function (callback, file) {
     //  });
 }
 
-module.exports = GinxParserTest;
+module.exports = Helper;

@@ -11,16 +11,19 @@
  */
 var fs = require('fs'),
     path = require('path'),
-    GinxParserTest = require(path.join(__dirname, '/test/setup/ginxparsertest')),
-    parserTestHelper = new GinxParserTest();
+    Helper = require(path.join(__dirname, '/test/setup/helper')),
+    testHelper = new Helper();
+    
+require('v8-profiler');
+
 // give it a try 
-// setupTest(NumberOfFilesToCreateThenParse, file's size => 'large'(~20k lines) or 'small' (~50 lines) or 'tiny'(~10 lines), DeleteTheStorageBefore?, cb)
-parserTestHelper.setupTest(60, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS IF YOU WANT TO TRY THE PERSISTENCE*/, function () {
+// setupTest(NumberOfFilesToCreateThenParse, file's sizes => 'large'(~20k lines) or 'small' (~50 lines) or 'tiny'(~10 lines), DeleteTheStorageBefore?, cb)
+testHelper.setupTest(5, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS IF YOU WANT TO TRY THE PERSISTENCE*/, function () {
     console.log("[GINXPARSER-DEBUG-DEMO] finished SetupTest - Parsing begins now");
     var startTime = Date.now();
+       
     // This is how you would use it usually, in a NodeJS program
     // Require the module
-
     var GinxParser = require(path.join(__dirname, '/lib/ginxparser')); // OR require('ginxparser'), depends how and where you isntalled it
     
     //construct a parser object, 
@@ -30,7 +33,9 @@ parserTestHelper.setupTest(60, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE
     // turning that to False will impact performance positevly as well, but of course everything depends on what you're trying to do with the logs, 
     var parser = new GinxParser({'persistent': true, 'fieldsToObjects': false});
     
-//UNCOMMENT THIS BLOCK, COMMENT THE ONE BELOW, to try out parseDir()    
+    
+//UNCOMMENT THIS BLOCK, COMMENT THE ONE BELOW, to try out parseDir() alone, 
+//(you can test them together, it's just if you're parsing a mutual file, it's record will get overwritten by the last occurence and you will get the its rowCallbacks twice)    
 ///* 
     parser.parseDir(path.join(__dirname, "/./test/tmplogs"),
         function (err, row) {
@@ -54,11 +59,13 @@ parserTestHelper.setupTest(60, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE
             //        }
         }, function (err, file) {
             // something here
-        }, function (err) {
-            console.log("[GINXPARSER-DEBUG-DEMO] all Files parsing completed in " + (Date.now() - startTime) + " ms");
+        }, function (err, filesCount) {
+            console.log("[GINXPARSER-DEBUG-DEMO] " + filesCount + " Files parsing completed in " + (Date.now() - startTime) + " ms");
+            console.log("[GINXPARSER-DEBUG-DEMO] For the purpose of this demo, every run will delete then replace the previous storage before parsing, " 
+                        + " if you do not wish to delete it before a demo run, set the 3rd param in testHelper.setupTest to false" 
+                        + " at the top of demo.js.");
         });
 /// BLOCK ENDS HERE 	
-
 //*/
 
     /**
@@ -66,9 +73,9 @@ parserTestHelper.setupTest(60, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE
      * first callback prints out each row as it gets parsed
      * second callback prints out the file when it's completely parsed
      */
-//UNCOMMENT THIS BLOCK, COMMENT THE ONE ABOVE, to try out parseFile()    
+//UNCOMMENT THIS BLOCK, COMMENT THE ONE ABOVE, to try out parseFile() alone 
 /*     // IF YOU WANT TO ONLY RUN THIS TEST parseFile (a single file) change the first param in setupTest to 0 - so you won't have to wait for it to create mock files
-	parser.parseFile(path.join(__dirname, "/./test/logs/nginx_prod-large.log"), 
+	parser.parseFile(path.join(__dirname, "/./test/logs/nginx_prod-small.log"), 
 	//parser.parseFile("/Users/akhoury/.Trash/nginx_prod-enourmous.log",
 		function (err, row) {
 			if (err) {throw err;}

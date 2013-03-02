@@ -58,7 +58,7 @@ Parse all files in the first level of a directory (they have to all have the sam
 	* directory - a string representing the directory that has the files to be parsed
 	* rowCallback(err, row) - a callback function for each row's end of parse, with the error if any, and the result row object
 	* fileCallback(err, file) - a callback function for file's end of parse
-	* dirCallback(err) - a callback function for Dir's end of parse
+	* dirCallback(err, filesParsedCount) - a callback function for Dir's end of parse
 
 INSTALL
 -------
