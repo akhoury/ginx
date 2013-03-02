@@ -8,11 +8,11 @@
     "engines": {
         "node": ">=0.8.11"
     },
-    "dependencies": {
-        "fs-extra": ">=0.5.0",
-        "mocha": ">=1.8.1"
+    "devDependencies": {
+        "fs-extra": "0.5.0",
+        "mocha": "1.8.1"
     },
-    "description": "An Nginx log parser for node.js written in Javascript.",
+    "description": "A fast Nginx log parser for node.js written in Javascript.",
     "author": "Aziz Khoury<bentael@gmail.com>",
     "homepage": "https://github.com/akhoury/ginxparser",
     "repository": {

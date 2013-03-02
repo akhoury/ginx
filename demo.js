@@ -43,7 +43,7 @@ testHelper.setupTest(100, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS
             //uncomment on your own risk :P - this will print out every row after it gets parsed, and it has a performance hit.
             //usually these would be persisted to a database, or handled in an analysis, or search
             //I would change the setupTest to parse 2 or 3 'tiny' files if you don't want to fill up your terminal before uncommenting.             
-            //console.log("[GINXPARSER-DEBUG-DEMO] " + row.time_local);
+            //console.log("[GINXPARSER-DEBUG-DEMO] " +  JSON.stringify(row));
         
             // Here's a sample one row output, the attributes may change depending on the format, except __file and __originalText
             //		  { __file: '/Users/akhoury/code/ginxparser/test/tmplogs/_large_nginx1.log',
@@ -83,7 +83,7 @@ testHelper.setupTest(100, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS
 			    //uncomment on your own risk - this will print out every row, 
 				//usually these would be persisted to the database, or handled in an analysis, or search
 			
-			 //console.log(row);
+			 //console.log("[GINXPARSER-DEBUG-DEMO] " + JSON.stringify(row));
 			},
 		function(err, file){
 		 console.log("[GINXPARSER-DEBUG-DEMO] " + file + " parsing completed in " + (Date.now()-startTime) + " ms");

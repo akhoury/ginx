@@ -44,11 +44,11 @@ Parse one line string
 	Also, the result object has three attributes __file which is the file parsed from, and __originalText which the original text before parsing.
 
 
-##parser.parseFile(filename, rowCallback, fileCallback)##
+##parser.parseFile(path, rowCallback, fileCallback)##
 
 Parse a file
 * Arguments
-	* filename - a string representing the file to be parsed
+	* path - a string representing the path to the file to be parsed
 	* rowCallback(err, row) - a callback function for each row's end of parse, with the error if any, and the result row object
 	* fileCallback(err, file) - a callback function for file's end of parse
 	* dirCallback(err) - an Optional callback function for Dir's end of parse, if any
@@ -65,8 +65,10 @@ Parse all files in the first level of a directory (they have to all have the sam
 INSTALL
 -------
   (It's not on NPM yet so you need to install manually)
-  cp the ginxparser dir into your program's node_modules
-  npm install
+	git clone https://github.com/akhoury/ginxparser.git
+  
+	cp the ginxparser dir into your program's node_modules
+  'npm install' if you want to install devDependencies and run the demo.js or any of the mocha tests
 
   you can 'node demo.js' to try it out quick, but please open demo.js and read the comments quickly.
 
@@ -76,10 +78,10 @@ EXAMPLE USAGE
 	var GinxParser = require("./lib/ginxparser");
 	var parser = new GinxParser();
 	//example read from file
-	nparser.parseFile("nginx_prod.log", 	
+	parser.parseFile("nginx_prod.log", 	
 	  function(err, row){
 		  if (err) throw err;
-		  console.log("this will print each parsed line:" + row);
+		  console.log("this will print each parsed line:" + JSON.stringify(row));
 	  },	  
 	  function(err, file){
 		if (err) throw err;
