@@ -44,7 +44,7 @@ Parse one line string
 	Also, the result object has three attributes __file which is the file parsed from, and __originalText which the original text before parsing.
 
 
-##parser.parseFile(filename, rowCallback, fileCallback, dirCallback)##
+##parser.parseFile(filename, rowCallback, fileCallback)##
 
 Parse a file
 * Arguments
