@@ -1,12 +1,12 @@
 var assert = require('assert'),
     path = require('path'),
     fs = require('fs'),
-    GinxParser = require(path.join(__dirname, './../lib/ginxparser')),
+    Ginx = require(path.join(__dirname, './../lib/ginx')),
     Helper = require(path.join(__dirname, './setup/helper')),
     testHelper, parser, data, storageFile = path.join(__dirname, '/storage/persistent/line/cursors.json');
 
 before(function(done) {
-    parser = new GinxParser({'persistent':true,'storageFile': storageFile});
+    parser = new Ginx({'persistent':true,'storageFile': storageFile});
     testHelper = new Helper();
     testHelper.storageTmpFile = storageFile;
     testHelper.emptyTmpStorage(storageFile, function () {
@@ -15,10 +15,10 @@ before(function(done) {
 });
 
 describe('.parseLine ', function (done) {
-    var GinxParser = require(path.join(__dirname, './../lib/ginxparser'));
+    var Ginx = require(path.join(__dirname, './../lib/ginx'));
     it('should parse a line of nginx logs and return correct object values', function (done) {
         var format = '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"';
-        var parser = new GinxParser(format, {'fieldsToObjects': true});
+        var parser = new Ginx(format, {'fieldsToObjects': true});
         var line = '10.100.9.92 - - [12/Nov/2012:12:11:28 -0500] "GET /favicon.ico HTTP/1.1" 502 574 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"';
         var __file = "fakefile.jpg";
         var __originalText = line;

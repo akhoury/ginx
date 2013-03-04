@@ -1,18 +1,18 @@
 var assert = require('assert'),
     path = require('path'),     
-    GinxParser = require(path.join(__dirname, './../lib/ginxparser')),
+    Ginx = require(path.join(__dirname, './../lib/ginx')),
     Helper = require(path.join(__dirname, './setup/helper')), 
     testHelper, parser, count, storageFile = path.join(__dirname, '/storage/persistent/file/cursors.json'); 
     
 testHelper = new Helper();
-parser = new GinxParser({'persistent': true, 'fieldsToObjects': true, 'storageFile':storageFile});
+parser = new Ginx({'persistent': true, 'fieldsToObjects': true, 'storageFile':storageFile});
 
 
 before(function(done) {
     count = 30;
     testHelper.storageTmpFile = storageFile;
     testHelper.setupTest(count, 'small', true, function (file) {
-        console.log("[GINXPARSER-TEST][PARSEDIR] before setup done");
+        console.log("[GINX-TEST][PARSEDIR] before setup done");
         done();
     }, storageFile);
 });
@@ -45,8 +45,8 @@ describe('.parseDir ', function (done) {
 });
 after(function(done) {
     //testHelper.emptyTmpStorage(storageFile, function () {
-        //console.log("[GINXPARSER-TEST] After test, deleting storage");       
-        console.warn("[GINXPARSER-TEST] NOTE: ParseDir() test copies " + count + " files to a tmp dir before parsing, "
+        //console.log("[GINX-TEST] After test, deleting storage");       
+        console.warn("[GINX-TEST] NOTE: ParseDir() test copies " + count + " files to a tmp dir before parsing, "
                      + "it maybe a little slower, depending on file size"
                      + "\n[IMPORTANT] Since Mocha have a 2000 ms timeout for each test, you can't use it to test very large"
                      + "file or too many files, these have to be done outside of mocha's suite, play around with demo.js using helper.js you can do magic in there.");

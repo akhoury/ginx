@@ -2,7 +2,7 @@ var fsx = require('fs-extra'),
     fs = require('fs'),
     path = require('path'),
     exec = require('child_process').exec,
-    GinxParser = require(path.join(__dirname, '../../lib/ginxparser'));
+    Ginx = require(path.join(__dirname, '../../lib/ginx'));
 
 /**
  * Helper constructor
@@ -46,7 +46,7 @@ Helper.prototype.setupTest = function (count, logSize, delPrevStorage, callback,
     });
 };
 Helper.prototype.copyLogFiles = function (n, size, callback) {
-    console.log("[GINXPARSER-TEST] COPYING " + n + " " + size + " log file(s) started");
+    console.log("[GINX-TEST] COPYING " + n + " " + size + " log file(s) started");
     var file, pre;
     if (size === this.TINY) {
         file = this.defaultOrgTinyLog;
@@ -66,11 +66,11 @@ Helper.prototype.copyFileMultipleToTmpLogs = function (nbCopies, file, pre, call
             if (err) {
                 throw err;
             }
-            console.log("[GINXPARSER-TEST] copied " + file + " to: " + trgFile);
+            console.log("[GINX-TEST] copied " + file + " to: " + trgFile);
             that.copyFileMultipleToTmpLogs(nbCopies - 1, file, pre, callback);
         });
     } else {
-        console.log("[GINXPARSER-TEST] All test log files copied.")
+        console.log("[GINX-TEST] All test log files copied.")
         callback(true)
     }
 }
@@ -78,7 +78,7 @@ Helper.prototype.emptyTmpStorage = function (file, callback) {
     var that = this, storageFile = file ? file : that.storageTmpFile;
     fs.writeFileSync(storageFile, "{}");//, function(err){
         //if (err) throw err;
-    console.log("[GINXPARSER-TEST] Emptied " + storageFile + " storage file");
+    console.log("[GINX-TEST] Emptied " + storageFile + " storage file");
     callback(storageFile);
     //});
 }

@@ -1,12 +1,12 @@
 var assert = require('assert'),
     path = require('path'),
     fs = require('fs'),
-    GinxParser = require(path.join(__dirname, './../lib/ginxparser')),
+    Ginx = require(path.join(__dirname, './../lib/ginx')),
     Helper = require(path.join(__dirname, './setup/helper')),
     testHelper, parser, data, storageFile = path.join(__dirname, '/storage/persistent/file/cursors.json'); 
 
 before(function(done) {
-    parser = new GinxParser({'persistent':true,'storageFile': storageFile});
+    parser = new Ginx({'persistent':true,'storageFile': storageFile});
     testHelper = new Helper();
     testHelper.storageTmpFile = storageFile;
     testHelper.emptyTmpStorage(storageFile, function (file) {

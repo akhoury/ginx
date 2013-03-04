@@ -19,19 +19,19 @@ var fs = require('fs'),
 // give it a try 
 // setupTest(NumberOfFilesToCreateThenParse, file's sizes => 'large'(~20k lines) or 'small' (~50 lines) or 'tiny'(~10 lines), DeleteTheStorageBefore?, cb)
 testHelper.setupTest(100, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS IF YOU WANT TO TRY THE PERSISTENCE*/, function () {
-    console.log("[GINXPARSER-DEBUG-DEMO] finished SetupTest - Parsing begins now");
+    console.log("[GINX-DEBUG-DEMO] finished SetupTest - Parsing begins now");
     var startTime = Date.now();
        
     // This is how you would use it usually, in a NodeJS program
     // Require the module
-    var GinxParser = require(path.join(__dirname, '/lib/ginxparser')); // OR require('ginxparser'), depends how and where you isntalled it
+    var Ginx = require(path.join(__dirname, '/lib/ginx')); // OR require('ginx'), depends how and where you isntalled it
     
     //construct a parser object, 
     // optionally you can pass in two arguments, a the format as a String of the the Nginx access_log format, and an options object {'persistent': true, 'fieldsToObjects': true} 
-    // default is {'persistent': true, 'fieldsToObjects': false} and the default Nginx access_log, check ./lib/ginxparser.js source to see the default format
+    // default is {'persistent': true, 'fieldsToObjects': false} and the default Nginx access_log, check ./lib/ginx.js source to see the default format
     // fieldsToObjects when true, it will try to convert each column's value to it's corresponding objects, so far i only parse dates to Date,  numbers to Number,and every '-' to null 
     // turning that to False will impact performance positevly as well, but of course everything depends on what you're trying to do with the logs, 
-    var parser = new GinxParser({'persistent': true, 'fieldsToObjects': false});
+    var parser = new Ginx({'persistent': true, 'fieldsToObjects': false});
     
     
 //UNCOMMENT THIS BLOCK, COMMENT THE ONE BELOW, to try out parseDir() alone, 
@@ -43,10 +43,10 @@ testHelper.setupTest(100, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS
             //uncomment on your own risk :P - this will print out every row after it gets parsed, and it has a performance hit.
             //usually these would be persisted to a database, or handled in an analysis, or search
             //I would change the setupTest to parse 2 or 3 'tiny' files if you don't want to fill up your terminal before uncommenting.             
-            //console.log("[GINXPARSER-DEBUG-DEMO] " +  JSON.stringify(row));
+            //console.log("[GINX-DEBUG-DEMO] " +  JSON.stringify(row));
         
             // Here's a sample one row output, the attributes may change depending on the format, except __file and __originalText
-            //		  { __file: '/Users/akhoury/code/ginxparser/test/tmplogs/_large_nginx1.log',
+            //		  { __file: '/Users/akhoury/code/ginx/test/tmplogs/_large_nginx1.log',
             //          __originalText: '10.100.9.92 - - [12/Nov/2012:12:15:69 -0500] "GET /assets/application-b3c5eeba998a57a7440394ae2ef6f6df.css HTTP/1.1" 200 111128 "http://demonet.trll.co/users/sign_in" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11"',
             //         remote_addr: '172.28.0.104',
             //         remote_user: null,
@@ -60,8 +60,8 @@ testHelper.setupTest(100, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS
         }, function (err, file) {
             // something here
         }, function (err, filesCount) {
-            console.log("[GINXPARSER-DEBUG-DEMO] " + filesCount + " Files parsing completed in " + (Date.now() - startTime) + " ms");
-            console.info("[GINXPARSER-DEBUG-DEMO] Note: For the purpose of this demo, every run will delete then replace the previous storage before parsing, " 
+            console.log("[GINX-DEBUG-DEMO] " + filesCount + " Files parsing completed in " + (Date.now() - startTime) + " ms");
+            console.info("[GINX-DEBUG-DEMO] Note: For the purpose of this demo, every run will delete then replace the previous storage before parsing, " 
                         + " if you do not wish to delete it before a demo run, set the 3rd param in testHelper.setupTest to false" 
                         + " at the top of demo.js.");
         });
@@ -83,10 +83,10 @@ testHelper.setupTest(100, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS
 			    //uncomment on your own risk - this will print out every row, 
 				//usually these would be persisted to the database, or handled in an analysis, or search
 			
-			 //console.log("[GINXPARSER-DEBUG-DEMO] " + JSON.stringify(row));
+			 //console.log("[GINX-DEBUG-DEMO] " + JSON.stringify(row));
 			},
 		function(err, file){
-		 console.log("[GINXPARSER-DEBUG-DEMO] " + file + " parsing completed in " + (Date.now()-startTime) + " ms");
+		 console.log("[GINX-DEBUG-DEMO] " + file + " parsing completed in " + (Date.now()-startTime) + " ms");
 		}
 	);
 */
