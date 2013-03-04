@@ -46,7 +46,7 @@ Helper.prototype.setupTest = function (count, logSize, delPrevStorage, callback,
     });
 };
 Helper.prototype.copyLogFiles = function (n, size, callback) {
-    console.log("[GINX-TEST] COPYING " + n + " " + size + " log file(s) started");
+    console.log("[GINX-TEST] copying " + n + " " + size + " log file(s) started");
     var file, pre;
     if (size === this.TINY) {
         file = this.defaultOrgTinyLog;
@@ -66,7 +66,7 @@ Helper.prototype.copyFileMultipleToTmpLogs = function (nbCopies, file, pre, call
             if (err) {
                 throw err;
             }
-            console.log("[GINX-TEST] copied " + file + " to: " + trgFile);
+            console.log("[GINX-TEST] COPYING " + file + " to: " + trgFile);
             that.copyFileMultipleToTmpLogs(nbCopies - 1, file, pre, callback);
         });
     } else {
