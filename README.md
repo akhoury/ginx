@@ -7,7 +7,7 @@ shutdown, unexpected exception or Ctrl+D, all that with the option of parsing a 
 ##TODO##
 
 * add tail -f feature to the command line tool using fs.watch or node-tail module
-* add Stop, Pause, Resume to the API 
+* add Stop, Pause, Resume, DeleteStorage to the API 
 * add auto detection feature for the format based on an example log line.
 * add support for Error logs
 * log with different levels (info, error, warning, debug, trace) to an optional log file
@@ -15,7 +15,6 @@ shutdown, unexpected exception or Ctrl+D, all that with the option of parsing a 
 * refactor some of the big functions
 * support other encodings
 * optional DEBUG param flag, and input/output paths flags
-* delete the storage if user chooses to run non-persistent
 * increase test coverage, seriously
 
 API
@@ -42,7 +41,7 @@ Parse one line string
 * Arguments
 	* line - a string representing the line to be parsed
 	* callback(err, row) - a callback function with the error if any, and the result row object which may contain custom attributes parsed from the format
-	Also, the result object has three attributes __file which is the file parsed from, and __originalText which the original text before parsing.
+	Also, the result object has more attributes __file which is the file parsed from, __originalText which the original text before parsing and __lastrow if it is
 	* options, optional hash, currently only supports 'file': path
 
 
