@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+'use strict';
+
 // if you want to use this command line tool you must 'npm install' to get 'optimist'
 var argv = require('optimist').argv,
     path = require('path'),
@@ -11,17 +13,23 @@ var argv = require('optimist').argv,
 function usage(notice) {
     if (notice) console.log('\n' + notice);
     console.log(
-        '\n\nUsage: ginx -i [path] -o [path] -t -n -f [format] -s [storage]' 
-        + '\nthis tool will parse an nginx_log format and saves it in a JSON format. I don\'t know how much that is useful,'
-        + '\nplus, there is a huge performance hit by wrting another JSON to file at the same time,' 
+        '\nUsage: ginx --input [path] --output [path] -t -n -f [format] -s [storage]' 
+        + '\n\nthis tool will parse nginx log files and save it/them in a JSON format. I don\'t know how much that is useful,'
+        + '\nPlus, there is a huge performance hit by writing another JSON file(s) at the same time.'
+        + '\nThe other problem with this is that is closing the JSON brackets at the end of each file, to complete the structure,'
+        + '\nso if you parse a log file and it completes. Then sometime later you parse the same file again if there is more logs appended to it,' 
+        + '\nthe total resulted JSON structure will not be correct, syntax wise. However, if a crash or a kill occurs, '
+        + '\nand the JSON is not closed yet, the resulted syntax will be fine once you resume the parsing'
+        + '\nI will be implementing a tail -f like feature soon, it may make this tool more useful, stay tuned.'
         + '\n[BROTIP] if I were you I would just use the module in a node.js program, get what you need out of each row -- i don\'t even know why I wrote this tool'
         + '\nif you have a large log file to parse, you will end up with an even larger JSON file, I mean sure, it\'s a JSON.. whateves\n' 
         + '\n-i | --input          : input file OR directory to parse' 
         + '\n-o | --output         : destination file OR directory of where you would like to program the save the JSON file(s)'
         + '\n-f | --format         : [OPTIONAL] the format of your nginx access_log, if different then default [IMPORTANT] you must escape double quotes, the format MUST be exactly the same' 
         + '\n-n | --nonpersistent  : [OPTIONAL] a boolean value, defaults to true if not passed, if passed the program will not keep track of the file\'s positions, aka cursors, so it can\'t pick it where it left off in case of a crash or kill' 
-        + '\n-t | --fields2objects : [OPTIONAL] a boolean value, defaults to false if not passed, if passed the program will try to parse each field to a corresponding object, such as Date, Integer and NULL if \'-\' - may hit performance a little if large or too many files' 
+        + '\n-j | --fields2objects : [OPTIONAL] a boolean value, defaults to false if not passed, if passed the program will try to parse each field to a corresponding object, such as Date, Integer and NULL if \'-\' - may hit performance a little if large or too many files' 
         + '\n-s | --storage        : [OPTIONAL] a custome storage file for the file\'s positions cursors, it uses ./tmp/storage.cursors by default, but it won\'t save anything if --persistent is false' 
+        + '\n-g | --original       : [OPTIONAL] a boolean value, defaults to false, if passed, it will augment each row JSON object with its original text, if you need it, use it, if you don\' leave it out, it will make you output a lot larger'
         + '\n-h | --help           : [OPTIONAL] displays this message' 
         + '\n-v | --verbose        : [OPTIONAL] verbose, but this could get ugly, and print each row on the screen, huge performance hit, don\'t use it' 
         + '\n-c | --clear          : [OPTIONAL] will clear the cursors storage first, use it with -s if you have a custom storage file, otherwise it clears the default' + '\n\n');
@@ -55,6 +63,7 @@ writer = {
         var data = this.files[path].queue.shift(),
             self = this;
         if (data === undefined) return this.files[path].open = false;
+        if(verbose) console.log("[GINX-INFO] WRITING " +  data + " TO " + path );
         fs.appendFile(path, data, function (err) {
             if (err) error(err);
             self.nextWrite(path);
@@ -73,7 +82,7 @@ if (argv.h || argv.help) {
 }
 input = argv.i || argv.input;
 output = argv.o || argv.output;
-io_notice = 'You must pass both input and output, if input is a file, output will be a file, same for directories (limnit to 50 files please)'
+io_notice = 'You must pass both input and output, if input is a file, output will be a file, same for directories (limit to <50 files please)'
             + 'if input is a directory, output will be a directory as well, and you can\'t use the same directory nor same file for both arguments';
 if (!input || !output) {
     return usage(io_notice);
@@ -92,7 +101,7 @@ format = argv.f || argv.format || null;
 verbose = argv.v || argv.verbose || false;
 storage = argv.s || argv.storage || path.join(__dirname + '/../tmp/stored.cursors');
 
-//clearing storage if requrested before constructing Ginx. 
+//clearing storage if requested before constructing Ginx. 
 if (argv.c || argv.clear) {
     fs.writeFileSync(storage, "{}");
     console.log("[GINX-INFO] Emptied " + storage + " storage file");
@@ -101,7 +110,7 @@ if (argv.c || argv.clear) {
 //construct the Ginx parser
 parser = new Ginx(format, {
     'persistent': argv.n || argv.nonpersistent ? false : true,
-    'fieldsToObjects': argv.t || argv.fields2objects ? true : false,
+    'fieldsToObjects': argv.j || argv.fields2objects ? true : false,
     'storageFile': argv.s || argv.storage || null
 });
 
@@ -122,10 +131,10 @@ if (stats.isDirectory()) {
 } else if (stats.isFile()) {
     if (isNewFile(input)) {
         fs.writeFile(output, "{[", function () {
-            processfile(input, output);
+            processFile(input, output);
         });
     } else {
-        processfile(input, output);
+        processFile(input, output);
     }
 }
 

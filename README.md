@@ -6,7 +6,7 @@ shutdown, unexpected exception or Ctrl+D, all that with the option of parsing a 
 
 ##TODO##
 
-* create a command line tool with tail -f feature, along with verbose flag
+* add tail -f feature to the command line tool using fs.watch or node-tail module
 * add Stop, Pause, Resume to the API 
 * add auto detection feature for the format based on an example log line.
 * add support for Error logs
@@ -33,6 +33,7 @@ Construct a 'new Ginx();
 	  * 'persistent' defaults to true, whether your program will persist file positions to a local file in ./tmp/stored.cursors
 	  * 'fieldsToObjects' defaults to false, whether the program will attempt to parse every column to its corresponding object, i.e Date, Number, or Null - if turned to True, it may impact the performance depending on Number and Size of files getting parsed.
 	  * 'storageFile' defaults to ./tmp/stored.cursors, which file you want to store the cursors in
+		* 'originalText' - defaults to false, a boolean, if true, it will augment each row JSON object with its original text on an __originalText property
 
 
 ##parser.parseLine(line, rowCallback, options={})##
