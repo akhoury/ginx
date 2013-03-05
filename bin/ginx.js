@@ -42,7 +42,7 @@ function error(err) {
 }
 
 // creating a wrting queue to write the JSON files
-// appeding data asynchronously to the same 
+// appending data asynchronously to the same 
 // file doesn't guarantee the order of this data
 writer = {
     files: {},
@@ -71,7 +71,7 @@ writer = {
     }
 }
 
-// check if parser has a cached reference for this file in the loaded cursors from storage file, that happened in the Ginx constructor
+// check if parser has a cached reference for this file in the loaded cursors from storage file, that latter happens in the Ginx constructor
 function isNewFile(f) {
     return parser.__mem.cursors[parser.getStorageKeyfromPath(f)] ? false : true;
 }
