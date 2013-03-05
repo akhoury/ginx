@@ -13,16 +13,17 @@ var argv = require('optimist').argv,
 function usage(notice) {
     if (notice) console.log('\n' + notice);
     console.log(
-        '\nUsage: ginx --input [path] --output [path] -t -n -f [format] -s [path]' 
+        '\nThis tool is still under develpment(issues #4, #6, #7 and probably more) - JSON output is too heavy and will be replaced by either CSV or database inserts instead.'
+        + '\nUsage: ginx --input [path] --output [path] -t -n -f [format] -s [path]' 
         + '\n\nthis tool will parse nginx log files and save it/them in a JSON format. I don\'t know how much that is useful,'
-        + '\nPlus, there is a huge performance hit by writing another JSON file(s) at the same time.'
+        + '\nPlus, there is a HUGE performance hit by writing another JSON file(s) at the same time. OUT OF MEMORY risks, DO NOT USE IT YET'
         + '\nThe other problem with this (issue #1) is that is closing the JSON brackets at the end of each file, to complete the structure,'
         + '\nso if you parse a log file and it completes. Then sometime later you parse the same file again if there is more logs appended to it,' 
         + '\nthe total resulted JSON structure will not be correct, syntax wise. However, if a crash or a kill occurs, '
         + '\nand the JSON is not closed yet, the resulted syntax will be fine once you resume the parsing'
         + '\nI will be implementing a tail -f like feature soon, it may make this tool more useful, stay tuned.'
-        + '\n[BROTIP] if I were you I would just use the module in a node.js program, get what you need out of each row -- i don\'t even know why I wrote this tool'
-        + '\nif you have a large log file to parse, you will end up with an even larger JSON file, I mean sure, it\'s a JSON.. whateves\n' 
+        + '\n[BROTIP] if I were you I would just use the module in a node.js program, get what you need out of each row, persist to a DB or something -- i don\'t even know why I wrote this tool'
+        + '\nif you have a large log file to parse, you will end up with an even larger JSON file, probably an OUT OF MEMORY error first. \n' 
         + '\n-i | --input          : input file OR directory to parse' 
         + '\n-o | --output         : destination file OR directory of where you would like to program the save the JSON file(s)'
         + '\n-f | --format         : [OPTIONAL] the format of your nginx access_log, if different then default [IMPORTANT] you must escape double quotes, the format MUST be exactly the same, single quotes in nginx format are not supported yet. (issue #5)' 
@@ -44,6 +45,7 @@ function error(err) {
 // creating a wrting queue to write the JSON files
 // appending data asynchronously to the same 
 // file doesn't guarantee the order of this data
+//TODO handle streams here instead
 writer = {
     files: {},
     appendFile: function (path, data) {
@@ -61,12 +63,13 @@ writer = {
     },
     write: function (path) {
         var data = this.files[path].queue.shift(),
-            self = this;
+            that = this;
         if (data === undefined) return this.files[path].open = false;
         if(verbose) console.log("[GINX-INFO] WRITING " +  data + " TO " + path );
+        //TODO use write streams !!!!!!! issue (#7)
         fs.appendFile(path, data, function (err) {
             if (err) error(err);
-            self.write(path);
+            that.write(path);
         });
     }
 }
