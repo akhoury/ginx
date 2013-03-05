@@ -13,17 +13,17 @@ var argv = require('optimist').argv,
 function usage(notice) {
     if (notice) console.log('\n' + notice);
     console.log(
-        '\nThis tool is still under develpment(issues #1, #4, #6, #7 and probably more) - JSON output is too heavy and will be replaced by either CSV or database inserts instead.'
+        '\nThis tool is still under develpment(issues #1, #4, #8 and probably more) - JSON output is too heavy and will be replaced by either CSV or database inserts instead.'
         + '\nUsage: ginx --input [path] --output [path] -t -n -f [format] -s [path]' 
         + '\n\nthis tool will parse nginx log files and save it/them in a JSON format. I don\'t know how much that is useful,'
-        + '\nPlus, there is a HUGE performance hit by writing another JSON file(s) at the same time. OUT OF MEMORY risks, DO NOT USE IT YET'
+        + '\nPlus, there is a HUGE performance hit by writing another JSON file(s) at the same time.'
         + '\nThe other problem with this (issue #1) is that is closing the JSON brackets at the end of each file, to complete the structure,'
         + '\nso if you parse a log file and it completes. Then sometime later you parse the same file again if there is more logs appended to it,' 
         + '\nthe total resulted JSON structure will not be correct, syntax wise. However, if a crash or a kill occurs, '
         + '\nand the JSON is not closed yet, the resulted syntax will be fine once you resume the parsing'
-        + '\nI will be implementing a tail -f like feature soon, it may make this tool more useful, stay tuned.'
+        + '\nI will be implementing a tail -f like feature soon, it may make this tool more useful, stay tuned. Meanwhile, limit usage to 50 files max '
         + '\n[BROTIP] if I were you I would just use the module in a node.js program, get what you need out of each row, persist to a DB or something -- i don\'t even know why I wrote this tool'
-        + '\nif you have a large log file to parse, you will end up with an even larger JSON file, probably an OUT OF MEMORY error first. \n' 
+        + '\nif you have a large log file to parse, you will end up with an even larger JSON file. \n' 
         + '\n-i | --input          : input file OR directory to parse' 
         + '\n-o | --output         : destination file OR directory of where you would like to program the save the JSON file(s)'
         + '\n-f | --format         : [OPTIONAL] the format of your nginx access_log, if different then default [IMPORTANT] you must escape double quotes, the format MUST be exactly the same, single quotes in nginx format are not supported yet. (issue #5)' 
@@ -40,38 +40,6 @@ function usage(notice) {
 function error(err) {
     return console.log("[GINX-ERROR]:" + err.message);
     throw err;
-}
-
-// creating a wrting queue to write the JSON files
-// appending data asynchronously to the same 
-// file doesn't guarantee the order of this data
-//TODO handle streams here instead
-writer = {
-    files: {},
-    appendFile: function (path, data) {
-        if (this.files[path] === undefined) {
-            this.files[path] = {
-                open: false,
-                queue: []
-            };
-        }
-        this.files[path].queue.push(data);
-        if (!this.files[path].open) {
-            this.files[path].open = true;
-            this.write(path);
-        }
-    },
-    write: function (path) {
-        var data = this.files[path].queue.shift(),
-            that = this;
-        if (data === undefined) return this.files[path].open = false;
-        if(verbose) console.log("[GINX-INFO] WRITING " +  data + " TO " + path );
-        //TODO use write streams !!!!!!! issue (#7)
-        fs.appendFile(path, data, function (err) {
-            if (err) error(err);
-            that.write(path);
-        });
-    }
 }
 
 // check if parser has a cached reference for this file in the loaded cursors from storage file, that latter happens in the Ginx constructor
@@ -104,8 +72,16 @@ format = argv.f || argv.format || null;
 verbose = argv.v || argv.verbose || false;
 storage = argv.s || argv.storage || path.join(__dirname + '/../tmp/stored.cursors');
 
-//clearing storage if requested before constructing Ginx. 
-if (argv.c || argv.clear) {
+// MAKING SURE the storage file is there before we continue, bunch of Sync calls but needed
+// this will need to be updated when fs.writeFile be able to create directories recursivly
+if(!fs.existsSync(storage)){
+    var storageDir = path.normalize(storage.substring(0, storage.lastIndexOf(path.sep)));
+    if(!fs.existsSync(storageDir)){
+        fs.mkdirSync(storageDir);
+    }
+    fs.writeFileSync(storage, "{}");
+} else if (argv.c || argv.clear) {
+    //clearing storage if requested before constructing Ginx.
     fs.writeFileSync(storage, "{}");
     console.log("[GINX-INFO] Emptied " + storage + " storage file");
 }
@@ -117,43 +93,75 @@ parser = new Ginx(format, {
     'storageFile': argv.s || argv.storage || null
 });
 
+
+// creating a writer to handle the data buffering from the parser's readstreams
+writer = {
+    wstreams: {},
+    append: function(data, wfile, rfile){
+        if(data 
+            && this.wstreams[wfile] 
+            && (this.wstreams[wfile].write(data) == false) 
+            && parser.rstreams[rfile]
+            && parser.rstreams[rfile].pause){
+                parser.rstreams[rfile].pause();
+        }
+    },
+    addStream: function(wfile, rfile, callback){
+        var wstream = fs.createWriteStream(wfile, {'flags': 'w+', 'encoding':'utf8', 'mode': '0666'});
+        this.wstreams[wfile] = wstream;
+        this.wstreams[wfile].on('drain', function(){
+            if(parser.rstreams[rfile]
+                && parser.rstreams[rfile].readable 
+                && parser.rstreams[rfile].resume){
+                    parser.rstreams[rfile].resume();
+            }
+        });
+        callback();
+    }
+}
+// let the parsing begin !!! 
+
+// process directory parsing
 if (stats.isDirectory()) {
     fs.mkdir(output, function () {
         fs.readdir(input, function (err, files) {
             if (err) error(err);
             files.forEach(function (file) {
-                file = path.join(output, file);
-                //prepend the JSON openings for each file before we go on.
-                if (isNewFile(path.join(input, file))) {
-                    fs.writeFileSync(file, "{[");
-                }
+                var wfile = path.join(output, file),
+                    rfile = path.join(input, file);
+                writer.addStream(wfile, rfile, function(){
+                    //prepend the JSON openings for each new file before we go on.
+                    if (isNewFile(rfile)) {
+                        writer.append("{[", wfile, rfile);
+                    }
+                });
             });
+            console.log("Start processing directory");
             processDirectory(input, output);
         });
     });
 } else if (stats.isFile()) {
-    if (isNewFile(input)) {
-        fs.writeFile(output, "{[", function () {
-            processFile(input, output);
-        });
-    } else {
+    writer.addStream(output, input, function(){
+        if (isNewFile(input)) {
+            writer.append("{[", output, input);
+        }  
         processFile(input, output);
-    }
-}
+    });
 
+}
 // process file parsing to JSON output
 function processFile(input, ouput) {
     parser.parseFile(input,
 
     function (err, row) {
         if (err) error(err);
-        writer.appendFile(output, ifLastRow(row));
+        writer.append(ifLastRow(row), output, row.__file);
     },
 
-    function (err, file) {
+    function (err, rfile) {
         if (err) error(err);
         //close the JSON array
-        writer.appendFile(output, "]}");
+        writer.append("]}", output, rfile);
     });
 }
 
@@ -164,18 +172,22 @@ function processDirectory(input, output) {
     function (err, row) {
         if (err) error(err);
         var fname = row.__fname;
-        writer.appendFile(path.join(output, fname), ifLastRow(row));
+        writer.append(ifLastRow(row), path.join(output, fname), row.__file);
     },
 
-    function (err, file) {
+    function (err, rfile) {
         if (err) error(err);
-        var outputFile = path.join(output, file.substring(file.lastIndexOf(path.sep) + 1));
+        var wfile = path.join(output, rfile.substring(rfile.lastIndexOf(path.sep) + 1));
         //close the JSON array
-        writer.appendFile(outputFile, "]}");
+        writer.append("]}", wfile, rfile);
     },
 
     function (err, filesCount) {
         if (err) error(err);
+        if (parser.__mem.child) {
+            parser.__mem.child.kill('SIGKILL');
+        }
+        process.exit(0)
     });
 }
 
