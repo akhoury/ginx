@@ -66,7 +66,7 @@ writer = {
         if(verbose) console.log("[GINX-INFO] WRITING " +  data + " TO " + path );
         fs.appendFile(path, data, function (err) {
             if (err) error(err);
-            self.nextWrite(path);
+            self.write(path);
         });
     }
 }
