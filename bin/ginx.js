@@ -16,7 +16,7 @@ function usage(notice) {
         '\nUsage: ginx --input [path] --output [path] -t -n -f [format] -s [storage]' 
         + '\n\nthis tool will parse nginx log files and save it/them in a JSON format. I don\'t know how much that is useful,'
         + '\nPlus, there is a huge performance hit by writing another JSON file(s) at the same time.'
-        + '\nThe other problem with this is that is closing the JSON brackets at the end of each file, to complete the structure,'
+        + '\nThe other problem with this (issue #1) is that is closing the JSON brackets at the end of each file, to complete the structure,'
         + '\nso if you parse a log file and it completes. Then sometime later you parse the same file again if there is more logs appended to it,' 
         + '\nthe total resulted JSON structure will not be correct, syntax wise. However, if a crash or a kill occurs, '
         + '\nand the JSON is not closed yet, the resulted syntax will be fine once you resume the parsing'

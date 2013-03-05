@@ -66,13 +66,13 @@ Parse all files in the first level of a directory (they have to all have the sam
 
 INSTALL
 -------
-  (It's not on NPM yet so you need to install manually)
-	git clone https://github.com/akhoury/ginx.git
-  
-	cp the ginx dir into your program's node_modules
-  'npm install' if you want to install devDependencies and run the demo.js or any of the mocha tests
+(It's not on NPM yet so you need to install manually)
+	
+		git clone https://github.com/akhoury/ginx.git
+		# cp the ginx dir into your program's node_modules
+		npm install # to install dependencies 
 
-  you can 'node demo.js' to try it out quick, but please open demo.js and read the comments quickly.
+you can 'node demo.js' to try it out quick, but please open demo.js and read the comments quickly.
 
 EXAMPLE USAGE
 -------------
