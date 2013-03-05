@@ -13,7 +13,7 @@ var argv = require('optimist').argv,
 function usage(notice) {
     if (notice) console.log('\n' + notice);
     console.log(
-        '\nThis tool is still under develpment(issues #4, #6, #7 and probably more) - JSON output is too heavy and will be replaced by either CSV or database inserts instead.'
+        '\nThis tool is still under develpment(issues #1, #4, #6, #7 and probably more) - JSON output is too heavy and will be replaced by either CSV or database inserts instead.'
         + '\nUsage: ginx --input [path] --output [path] -t -n -f [format] -s [path]' 
         + '\n\nthis tool will parse nginx log files and save it/them in a JSON format. I don\'t know how much that is useful,'
         + '\nPlus, there is a HUGE performance hit by writing another JSON file(s) at the same time. OUT OF MEMORY risks, DO NOT USE IT YET'
