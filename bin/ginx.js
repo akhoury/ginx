@@ -13,7 +13,7 @@ var argv = require('optimist').argv,
 function usage(notice) {
     if (notice) console.log('\n' + notice);
     console.log(
-        '\nUsage: ginx --input [path] --output [path] -t -n -f [format] -s [storage]' 
+        '\nUsage: ginx --input [path] --output [path] -t -n -f [format] -s [path]' 
         + '\n\nthis tool will parse nginx log files and save it/them in a JSON format. I don\'t know how much that is useful,'
         + '\nPlus, there is a huge performance hit by writing another JSON file(s) at the same time.'
         + '\nThe other problem with this (issue #1) is that is closing the JSON brackets at the end of each file, to complete the structure,'
@@ -25,13 +25,13 @@ function usage(notice) {
         + '\nif you have a large log file to parse, you will end up with an even larger JSON file, I mean sure, it\'s a JSON.. whateves\n' 
         + '\n-i | --input          : input file OR directory to parse' 
         + '\n-o | --output         : destination file OR directory of where you would like to program the save the JSON file(s)'
-        + '\n-f | --format         : [OPTIONAL] the format of your nginx access_log, if different then default [IMPORTANT] you must escape double quotes, the format MUST be exactly the same' 
+        + '\n-f | --format         : [OPTIONAL] the format of your nginx access_log, if different then default [IMPORTANT] you must escape double quotes, the format MUST be exactly the same, single quotes in nginx format are not supported yet. (issue #5)' 
         + '\n-n | --nonpersistent  : [OPTIONAL] a boolean value, defaults to true if not passed, if passed the program will not keep track of the file\'s positions, aka cursors, so it can\'t pick it where it left off in case of a crash or kill' 
         + '\n-j | --fields2objects : [OPTIONAL] a boolean value, defaults to false if not passed, if passed the program will try to parse each field to a corresponding object, such as Date, Integer and NULL if \'-\' - may hit performance a little if large or too many files' 
-        + '\n-s | --storage        : [OPTIONAL] a custome storage file for the file\'s positions cursors, it uses ./tmp/storage.cursors by default, but it won\'t save anything if --persistent is false' 
-        + '\n-g | --original       : [OPTIONAL] a boolean value, defaults to false, if passed, it will augment each row JSON object with its original text, if you need it, use it, if you don\' leave it out, it will make you output a lot larger'
+        + '\n-s | --storage        : [OPTIONAL] a custome storage file for the file\'s positions cursors, it uses ./tmp/storage.cursors by default, but it won\'t save anything if --nonpersistent is passed' 
+        + '\n-g | --original       : [OPTIONAL] a boolean value, defaults to false, if passed, it will augment each row JSON object with its original text, if you need it, use it, if you don\' leave it out, it will make your output a lot larger'
         + '\n-h | --help           : [OPTIONAL] displays this message' 
-        + '\n-v | --verbose        : [OPTIONAL] verbose, but this could get ugly, and print each row on the screen, huge performance hit, don\'t use it' 
+        + '\n-v | --verbose        : [OPTIONAL] verbose, but this could get ugly, printing each row on the screen, huge performance hit, don\'t use it' 
         + '\n-c | --clear          : [OPTIONAL] will clear the cursors storage first, use it with -s if you have a custom storage file, otherwise it clears the default' + '\n\n');
 };
 
@@ -56,10 +56,10 @@ writer = {
         this.files[path].queue.push(data);
         if (!this.files[path].open) {
             this.files[path].open = true;
-            this.nextWrite(path);
+            this.write(path);
         }
     },
-    nextWrite: function (path) {
+    write: function (path) {
         var data = this.files[path].queue.shift(),
             self = this;
         if (data === undefined) return this.files[path].open = false;
