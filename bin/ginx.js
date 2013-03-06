@@ -184,7 +184,7 @@ function processDirectory(input, output) {
 
     function (err, filesCount) {
         if (err) error(err);
-        if (parser.__mem.child) {
+        if (parser.__mem.child && parser.__mem.child.connected) {
             parser.__mem.child.kill('SIGKILL');
         }
         process.exit(0)
