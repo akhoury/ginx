@@ -29,7 +29,7 @@ describe('.parseFile() ', function (done) {
         function (err, file) {
             assert.equal(false, !!err);
             assert.equal(15920, counter, "It's probably because a tiny bug, try emptying the storage file ("+storageFile+") manually and run test again, or just run the test now");
-            assert.equal("number", typeof parser.__mem.cursors[parser.getStorageKeyfromPath(file)]);
+            assert.equal("number", typeof parser.__mem.cursors[file]);
             done();
         });
     });

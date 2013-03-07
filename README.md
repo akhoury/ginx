@@ -7,7 +7,7 @@ shutdown, unexpected exception or Ctrl+D, all that with the option of parsing a 
 ##TODO##
 
 * add tail -f feature to the command line tool using fs.watch or node-tail module
-* add Stop, Pause, Resume, DeleteStorage to the API 
+* add DeleteStorage to the API 
 * add auto detection feature for the format based on an example log line.
 * add support for Error logs
 * log with different levels (info, error, warning, debug, trace) to an optional log file
@@ -35,7 +35,7 @@ Construct a 'new Ginx();
 		* 'originalText' - defaults to false, a boolean, if true, it will augment each row JSON object with its original text on an __originalText property
 
 
-##parser.parseLine(line, rowCallback, options={})##
+##ginx.parseLine(line, rowCallback, options={})##
 
 Parse one line string
 * Arguments
@@ -45,7 +45,7 @@ Parse one line string
 	* options, optional hash, currently only supports 'file': path
 
 
-##parser.parseFile(path, rowCallback, fileCallback, options={})##
+##ginx.parseFile(path, rowCallback, fileCallback, options={})##
 
 Parse a file
 * Arguments
@@ -55,7 +55,7 @@ Parse a file
 	* dirCallback(err) - an Optional callback function for Dir's end of parse, if any
 	* options, optional hash, currently only supports 'isPool': boolean, which is used internally to determine if this file was in the waiting pool or not, you don't need it at all if you're parsing a single file, even if you're not, parseDir will take care of that part if you're parsing multiple files.
 
-##parser.parseDir(directory, rowCallback, fileCallback, dirCallback)##
+##ginx.parseDir(directory, rowCallback, fileCallback, dirCallback)##
 
 Parse all files in the first level of a directory (they have to all have the same format)
 * Arguments
@@ -63,6 +63,26 @@ Parse all files in the first level of a directory (they have to all have the sam
 	* rowCallback(err, row) - a callback function for each row's end of parse, with the error if any, and the result row object
 	* fileCallback(err, file) - a callback function for file's end of parse
 	* dirCallback(err, filesParsedCount) - a callback function for Dir's end of parse
+
+##ginx.pause([readFile], [callback])##
+
+Pauses all ReadStreams in Ginx Memory, or a single file's stream if passed.
+* Arguments
+	* readFile - optional, the file path of the file being read by the ReadStream, if not passed, it will try to pause them all
+	* callback - optional, the callback after pausing completes
+
+##ginx.resume([readFile], [callback])##
+
+Resumes all ReadStreams in Ginx Memory, or a single file's stream if passed.
+* Arguments
+	* readFile - optional, the file path of the file being read by the ReadStream, if not passed, it will try to resume them all.
+	* callback - optional, the callback after resuming completes
+
+##ginx.stop([callback])##
+
+Stops all ReadStreams in Ginx Memory, then persists all cursors in memory
+* Arguments
+	* callback - optional, the callback after stoping completes
 
 INSTALL
 -------
@@ -78,9 +98,9 @@ EXAMPLE USAGE
 -------------
 
 	var Ginx = require("./lib/ginx");
-	var parser = new Ginx();
+	var ginx = new Ginx();
 	//example read from file
-	parser.parseFile("nginx_prod.log", 	
+	ginx.parseFile("nginx_prod.log", 	
 	  function(err, row){
 		  if (err) throw err;
 		  console.log("this will print each parsed line:" + JSON.stringify(row));

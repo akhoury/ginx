@@ -29,7 +29,7 @@ function usage(notice) {
         + '\n-o | --output         : destination file OR directory of where you would like to program the save the JSON file(s)'
         + '\n-f | --format         : [OPTIONAL] the format of your nginx access_log, if different then default [IMPORTANT] you must escape double quotes, the format MUST be exactly the same, single quotes in nginx format are not supported yet. (issue #5)' 
         + '\n-n | --nonpersistent  : [OPTIONAL] a boolean value, defaults to true if not passed, if passed the program will not keep track of the file\'s positions, aka cursors, so it can\'t pick it where it left off in case of a crash or kill' 
-        + '\n-j | --fields2objects : [OPTIONAL] a boolean value, defaults to false if not passed, if passed the program will try to parse each field to a corresponding object, such as Date, Integer and NULL if \'-\' - may hit performance a little if large or too many files' 
+        + '\n-j | --fields2objects : [OPTIONAL] a boolean value, defaults to false if not passed, if passed the program will try to parse each field to a corresponding object, such as Date, Integer and NULL if \'-\' - may hit performance bad, about 50% more time if large or too many files' 
         + '\n-s | --storage        : [OPTIONAL] a custome storage file for the file\'s positions cursors, it uses ./tmp/storage.cursors by default, but it won\'t save anything if --nonpersistent is passed' 
         + '\n-g | --original       : [OPTIONAL] a boolean value, defaults to false, if passed, it will augment each row JSON object with its original text, if you need it, use it, if you don\' leave it out, it will make your output a lot larger'
         + '\n-h | --help           : [OPTIONAL] displays this message' 
@@ -45,8 +45,8 @@ function error(err) {
 }
 
 // check if parser has a cached reference for this file in the loaded cursors from storage file, that latter happens in the Ginx constructor
-function isNewFile(f) {
-    return parser.__mem.cursors[parser.getStorageKeyfromPath(f)] ? false : true;
+function isNewFile(rfile) {
+    return parser.__mem.cursors[rfile] ? false : true;
 }
 
 // if -h or --help                    
@@ -112,21 +112,15 @@ writer = {
     append: function(data, wfile, rfile){
         if(data 
             && this.wstreams[wfile] 
-            && (this.wstreams[wfile].write(data) == false) 
-            && parser.rstreams[rfile]
-            && parser.rstreams[rfile].pause){
-                parser.rstreams[rfile].pause();
+            && this.wstreams[wfile].write(data) == false) {
+                parser.pause(rfile);
         }
     },
     addStream: function(wfile, rfile, flag, start, callback){
         var wstream = fs.createWriteStream(wfile, {'flags': flag ? flag : 'r+', 'start': start ? start : 0, 'mode': '0666'});
         this.wstreams[wfile] = wstream;
         this.wstreams[wfile].on('drain', function(){
-            if(parser.rstreams[rfile]
-                && parser.rstreams[rfile].readable 
-                && parser.rstreams[rfile].resume){
-                    parser.rstreams[rfile].resume();
-            }
+            parser.resume(rfile);
         });
         callback();
     }
@@ -148,7 +142,7 @@ if (stats.isDirectory()) {
                         if(err){
                             wnew = true;
                         }
-                        if (wnew) {
+                        if (wnew || rnew) {
                             writer.addStream(wfile, rfile, 'w+', 0, function(){
                                 if (type === 'csv'){
                                     writer.append(parser.attrs.join(',')+'\r\n', wfile, rfile);
@@ -172,7 +166,7 @@ if (stats.isDirectory()) {
         if(err){
             wnew = true;
         }
-        if (wnew) {
+        if (wnew || rnew) {
             writer.addStream(output, input, 'w+', 0, function(){
                 if (type === 'csv'){
                     writer.append(parser.attrs.join(',')+'\r\n', output, input);

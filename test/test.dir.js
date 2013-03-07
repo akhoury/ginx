@@ -33,7 +33,7 @@ describe('.parseDir ', function (done) {
 
             function (err, file) {
                 assert.equal(false, !!err);
-                assert.equal("number", typeof parser.__mem.cursors[parser.getStorageKeyfromPath(file)]);
+                assert.equal("number", typeof parser.__mem.cursors[file]);
             },
 
             function (err, filesCount) {
