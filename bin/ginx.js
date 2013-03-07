@@ -8,16 +8,17 @@ var argv = require('optimist').argv,
     fs = require('fs'),
     Ginx = require(path.join(__dirname, '/../lib/ginx')),
     parser, input, output, format, usage, stats, storage,
-    isFile, isDir, io_notice, verbose, fext = '.json', writer;
+    isFile, isDir, io_notice, verbose, type, writer, csvRow;
 
 function usage(notice) {
     if (notice) console.log('\n' + notice);
     console.log(
-        '\nThis tool is still under develpment(issues #1, #4, #8 and probably more) - JSON output is too heavy and will be replaced by either CSV or database inserts instead.'
+        '\nThis tool is still under develpment(issues #1, #4, #8 and probably more) -'
         + '\nUsage: ginx --input [path] --output [path] -t -n -f [format] -s [path]' 
-        + '\n\nthis tool will parse nginx log files and save it/them in a JSON format. I don\'t know how much that is useful,'
-        + '\nPlus, there is a HUGE performance hit by writing another JSON file(s) at the same time.'
-        + '\nThe other problem with this (issue #1) is that is closing the JSON brackets at the end of each file, to complete the structure,'
+        + '\n\nthis tool will parse nginx log files and save it/them in either CSV or JSON format. I don\'t know how much that is useful,'
+        + '\nAll of the CSV values are surrounded with double quotes, any inner commas are also surrounded by double quotes and, each original inner " is replaced by "" this was done following the CSV parsing conventions'
+        + '\nPlus, there is a HUGE performance hit by writing another JSON file(s) at the same time, Don\'t output to JSON please ! '
+        + '\nThe other problem with this (issue #1) is that, if you use JSON, is closing the JSON brackets at the end of each file, to complete the structure,'
         + '\nso if you parse a log file and it completes. Then sometime later you parse the same file again if there is more logs appended to it,' 
         + '\nthe total resulted JSON structure will not be correct, syntax wise. However, if a crash or a kill occurs, '
         + '\nand the JSON is not closed yet, the resulted syntax will be fine once you resume the parsing'
@@ -34,6 +35,7 @@ function usage(notice) {
         + '\n-h | --help           : [OPTIONAL] displays this message' 
         + '\n-v | --verbose        : [OPTIONAL] verbose, but this could get ugly, printing each row on the screen, huge performance hit, don\'t use it' 
         + '\n-c | --clear          : [OPTIONAL] will clear the cursors storage first, use it with -s if you have a custom storage file, otherwise it clears the default' + '\n\n');
+        + '\n-t | --type           : [OPTIONAL] followed by "json" or "csv", defaults to csv if not specified, specifies the structure of the output files'
 };
 
 // print error and throw it
@@ -72,6 +74,12 @@ format = argv.f || argv.format || null;
 verbose = argv.v || argv.verbose || false;
 storage = argv.s || argv.storage || path.join(__dirname + '/../tmp/stored.cursors');
 
+type = argv.t || argv.type || 'csv';
+if (type !== 'csv' && type !== 'json'){
+    console.log("[GINX-WARN] type : " + type + " is not supported or unknown, falling back to csv");
+    type = 'csv';
+} 
+
 // MAKING SURE the storage file is there before we continue, bunch of Sync calls but needed
 // this will need to be updated when fs.writeFile be able to create directories recursivly
 if(!fs.existsSync(storage)){
@@ -90,9 +98,13 @@ if(!fs.existsSync(storage)){
 parser = new Ginx(format, {
     'persistent': argv.n || argv.nonpersistent ? false : true,
     'fieldsToObjects': argv.j || argv.fields2objects ? true : false,
-    'storageFile': argv.s || argv.storage || null
+    'storageFile': argv.s || argv.storage || null,
+    'originalText': argv.g || argv.original ? true : false
 });
 
+if(type === 'csv'){
+  csvRow = generateCsvRow(this, parser.attrs);  
+}
 
 // creating a writer to handle the data buffering from the parser's readstreams
 writer = {
@@ -106,8 +118,8 @@ writer = {
                 parser.rstreams[rfile].pause();
         }
     },
-    addStream: function(wfile, rfile, callback){
-        var wstream = fs.createWriteStream(wfile, {'flags': 'w+', 'encoding':'utf8', 'mode': '0666'});
+    addStream: function(wfile, rfile, flag, start, callback){
+        var wstream = fs.createWriteStream(wfile, {'flags': flag ? flag : 'r+', 'start': start ? start : 0, 'mode': '0666'});
         this.wstreams[wfile] = wstream;
         this.wstreams[wfile].on('drain', function(){
             if(parser.rstreams[rfile]
@@ -123,31 +135,58 @@ writer = {
 
 // process directory parsing
 if (stats.isDirectory()) {
-    fs.mkdir(output, function () {
+    fs.mkdir(output, function (err) {
+        if (err){console.log(output + " already exists")}
         fs.readdir(input, function (err, files) {
             if (err) error(err);
             files.forEach(function (file) {
                 var wfile = path.join(output, file),
-                    rfile = path.join(input, file);
-                writer.addStream(wfile, rfile, function(){
-                    //prepend the JSON openings for each new file before we go on.
-                    if (isNewFile(rfile)) {
-                        writer.append("{[", wfile, rfile);
-                    }
-                });
+                    rfile = path.join(input, file),
+                    rnew = isNewFile(input),
+                    wnew = false;                   
+                    fs.stat(wfile, function(err, stats){
+                        if(err){
+                            wnew = true;
+                        }
+                        if (wnew) {
+                            writer.addStream(wfile, rfile, 'w+', 0, function(){
+                                if (type === 'csv'){
+                                    writer.append(parser.attrs.join(',')+'\r\n', wfile, rfile);
+                                } else if (type === 'json'){
+                                    writer.append("{[", wfile, rfile); 
+                                }
+                            });
+                        } else {
+                            writer.addStream(wfile, rfile,'r+', stats.size, function(){});        
+                        }    
+                    });
+                
             });
-            console.log("Start processing directory");
             processDirectory(input, output);
         });
     });
 } else if (stats.isFile()) {
-    writer.addStream(output, input, function(){
-        if (isNewFile(input)) {
-            writer.append("{[", output, input);
-        }  
-        processFile(input, output);
+    var rnew = isNewFile(input),
+        wnew = false;
+    fs.stat(output, function(err, stats){
+        if(err){
+            wnew = true;
+        }
+        if (wnew) {
+            writer.addStream(output, input, 'w+', 0, function(){
+                if (type === 'csv'){
+                    writer.append(parser.attrs.join(',')+'\r\n', output, input);
+                } else if (type === 'json'){
+                    writer.append("{[", output, input); 
+                }
+                processFile(input, output);
+            });
+        } else {
+            writer.addStream(output, input,'r+', stats.size, function(){
+                processFile(input, output);
+            });        
+        }    
     });
-
 }
 // process file parsing to JSON output
 function processFile(input, ouput) {
@@ -155,13 +194,12 @@ function processFile(input, ouput) {
 
     function (err, row) {
         if (err) error(err);
-        writer.append(ifLastRow(row), output, row.__file);
+        writer.append(formatRow(row), output, row.__file);
     },
 
     function (err, rfile) {
         if (err) error(err);
-        //close the JSON array
-        writer.append("]}", output, rfile);
+        if(type === 'json') { writer.append("]}", output, rfile); }
     });
 }
 
@@ -171,15 +209,13 @@ function processDirectory(input, output) {
 
     function (err, row) {
         if (err) error(err);
-        var fname = row.__fname;
-        writer.append(ifLastRow(row), path.join(output, fname), row.__file);
+        writer.append(formatRow(row), path.join(output, row.__fname), row.__file);
     },
 
     function (err, rfile) {
         if (err) error(err);
         var wfile = path.join(output, rfile.substring(rfile.lastIndexOf(path.sep) + 1));
-        //close the JSON array
-        writer.append("]}", wfile, rfile);
+        if(type === 'json') writer.append("]}", wfile, rfile);
     },
 
     function (err, filesCount) {
@@ -187,10 +223,31 @@ function processDirectory(input, output) {
         if (parser.__mem.child && parser.__mem.child.connected) {
             parser.__mem.child.kill('SIGKILL');
         }
-        process.exit(0)
+        //process.exit(0)
     });
 }
+//another ugly function
+function generateCsvRow(ctx, attrs) {
+    var args = 'row', i,
+        funcode = 'var csvRow="";\n';
+     for (i = 0; i < attrs.length; i++) {
+         if (attrs[i] !== '__originalText'){
+             funcode += 'csvRow += \'\"\' + row[\''+attrs[i]+'\'] + \'\"\';\n';
+         } else {
+             funcode += 'csvRow += \'\"\' + row[\''+attrs[i]+'\'].replace(/\\"/g, \'""\') + \'\"\';\n';
+         }
+         funcode +=  i !== attrs.length -1 ? 'csvRow += ",";\n' : '';
+     }
+     funcode += 'return csvRow+"\\r\\n";'
+     //console.log(funcode);
+     return Function.apply(ctx, [args, funcode]); 
+}
 
-function ifLastRow(row){
+function formatRow(row){
+    if(type === 'csv') return csvRow(row);
+    if(type === 'json') return jsonRow(row);
+    return row;
+}
+function jsonRow(row){
     return !row.__lastrow ? JSON.stringify(row) + "," : JSON.stringify(row);
 }
