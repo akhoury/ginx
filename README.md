@@ -11,7 +11,6 @@ shutdown, unexpected exception or Ctrl+D, all that with the option of parsing a 
 * add auto detection feature for the format based on an example log line.
 * add support for Error logs
 * log with different levels (info, error, warning, debug, trace) to an optional log file
-* use a better hashing algorithm for cursors keys
 * refactor some of the big functions
 * support other encodings
 * optional DEBUG param flag, and input/output paths flags

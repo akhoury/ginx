@@ -14,7 +14,7 @@ function usage(notice) {
     if (notice) console.log('\n' + notice);
     console.log(
         '\nThis tool is still under develpment(issues #1, #4, #8 and probably more) -'
-        + '\nUsage: ginx --input [path] --output [path] -t -n -f [format] -s [path]' 
+        + '\nUsage: ginx --input [path] --output [path] -t [type] -j -g -v -c -n -f [format] -s [path]' 
         + '\n\nthis tool will parse nginx log files and save it/them in either CSV or JSON format. I don\'t know how much that is useful,'
         + '\nAll of the CSV values are surrounded with double quotes, any inner commas are also surrounded by double quotes and, each original inner " is replaced by "" this was done following the CSV parsing conventions'
         + '\nPlus, there is a HUGE performance hit by writing another JSON file(s) at the same time, Don\'t output to JSON please ! '
