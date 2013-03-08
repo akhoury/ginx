@@ -24,7 +24,7 @@ function usage(notice) {
         + '\nand the JSON is not closed yet, the resulted syntax will be fine once you resume the parsing'
         + '\nI will be implementing a tail -f like feature soon, it may make this tool more useful, stay tuned. Meanwhile, limit usage to 50 files max '
         + '\n[BROTIP] if I were you I would just use the module in a node.js program, get what you need out of each row, persist to a DB or something -- i don\'t even know why I wrote this tool'
-        + '\nif you have a large log file to parse, you will end up with an even larger JSON file. \n' 
+        + '\nif you have a large log file to parse, you will end up with an even larger file if JSON for example.\n' 
         + '\n-i | --input          : input file OR directory to parse' 
         + '\n-o | --output         : destination file OR directory of where you would like to program the save the JSON file(s)'
         + '\n-f | --format         : [OPTIONAL] the format of your nginx access_log, if different then default [IMPORTANT] you must escape double quotes, the format MUST be exactly the same, single quotes in nginx format are not supported yet. (issue #5)' 
