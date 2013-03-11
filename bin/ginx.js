@@ -8,7 +8,8 @@ var argv = require('optimist').argv,
     fs = require('fs'),
     Ginx = require(path.join(__dirname, '/../lib/ginx')),
     parser, input, output, format, usage, stats, storage,
-    isFile, isDir, io_notice, verbose, type, writer, csvRow;
+    isFile, isDir, io_notice, verbose, type, writer, formatRow, 
+    csvRow, jsonRow;
 
 function usage(notice) {
     if (notice) console.log('\n' + notice);
@@ -45,7 +46,7 @@ function error(err) {
 }
 
 // check if parser has a cached reference for this file in the loaded cursors from storage file, that latter happens in the Ginx constructor
-function isNewFile(rfile) {
+function isInputFileNew(rfile) {
     return parser.__mem.cursors[rfile] ? false : true;
 }
 
@@ -102,9 +103,7 @@ parser = new Ginx(format, {
     'originalText': argv.g || argv.original ? true : false
 });
 
-if(type === 'csv'){
-  csvRow = generateCsvRow(this, parser.attrs);  
-}
+formatRow = generateFormatRow(this, type);
 
 // creating a writer to handle the data buffering from the parser's readstreams
 writer = {
@@ -125,6 +124,7 @@ writer = {
         callback();
     }
 }
+
 // let the parsing begin !!! 
 
 // process directory parsing
@@ -136,7 +136,7 @@ if (stats.isDirectory()) {
             files.forEach(function (file) {
                 var wfile = path.join(output, file),
                     rfile = path.join(input, file),
-                    rnew = isNewFile(input),
+                    rnew = isInputFileNew(input),
                     wnew = false;                   
                     fs.stat(wfile, function(err, stats){
                         if(err){
@@ -160,7 +160,7 @@ if (stats.isDirectory()) {
         });
     });
 } else if (stats.isFile()) {
-    var rnew = isNewFile(input),
+    var rnew = isInputFileNew(input),
         wnew = false;
     fs.stat(output, function(err, stats){
         if(err){
@@ -182,6 +182,7 @@ if (stats.isDirectory()) {
         }    
     });
 }
+
 // process file parsing to JSON output
 function processFile(input, ouput) {
     parser.parseFile(input,
@@ -220,10 +221,23 @@ function processDirectory(input, output) {
         //process.exit(0)
     });
 }
-//another ugly function
-function generateCsvRow(ctx, attrs) {
-    var args = 'row', i,
-        funcode = 'var csvRow="";\n';
+// decide which format type we're parsing and generate its code, 
+// saving some many checks that would have to occur at each rowCallback
+function generateFormatRow(ctx, type){
+    var funcode = '', args = 'row';
+    if (type === 'csv'){       
+       funcode += generateCsvRowCode(parser.attrs);
+    } else if (type === 'json'){
+        funcode += generateJsonRowCode(parser.attrs);
+    } else {
+        funcode += 'return row;'
+    }
+    console.log(funcode);
+    return Function.apply(ctx, [args, funcode]);
+}
+//ugly function that generate the CSV formatter code
+function generateCsvRowCode(attrs) {
+    var i, funcode = 'var csvRow ="";\n';
      for (i = 0; i < attrs.length; i++) {
          if (attrs[i] !== '__originalText'){
              funcode += 'csvRow += \'\"\' + row[\''+attrs[i]+'\'] + \'\"\';\n';
@@ -234,14 +248,10 @@ function generateCsvRow(ctx, attrs) {
      }
      funcode += 'return csvRow+"\\r\\n";'
      //console.log(funcode);
-     return Function.apply(ctx, [args, funcode]); 
+     return funcode;
 }
-
-function formatRow(row){
-    if(type === 'csv') return csvRow(row);
-    if(type === 'json') return jsonRow(row);
-    return row;
-}
-function jsonRow(row){
-    return !row.__lastrow ? JSON.stringify(row) + "," : JSON.stringify(row);
+//ugly function that generate the JSON formatter code
+//TODO Don't use JSON.stringify, write your own, based on attrs
+function generateJsonRowCode(attrs){
+    return 'return !row.__lastrow ? JSON.stringify(row) + "," : JSON.stringify(row);';
 }
