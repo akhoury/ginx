@@ -15,6 +15,7 @@ shutdown, unexpected exception or Ctrl+D, all that with the option of parsing a 
 * support other encodings
 * optional DEBUG param flag, and input/output paths flags
 * increase test coverage, seriously
+... along with few others entered as issues.
 
 API
 ---
