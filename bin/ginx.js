@@ -222,7 +222,7 @@ function processDirectory(input, output) {
     });
 }
 // decide which format type we're parsing and generate its code, 
-// saving some many checks that would have to occur at each rowCallback
+// saving so many checks that would have to occur at each rowCallback
 function generateFormatRow(ctx, type){
     var funcode = '', args = 'row';
     if (type === 'csv'){       
