@@ -86,8 +86,9 @@ Stops all ReadStreams in Ginx Memory, then persists all cursors in memory
 
 INSTALL
 -------
-(It's not on NPM yet so you need to install manually)
-	
+		npm install ginx
+		
+or manually 
 		git clone https://github.com/akhoury/ginx.git
 		# cp the ginx dir into your program's node_modules
 		npm install # to install dependencies 

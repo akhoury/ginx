@@ -9,7 +9,7 @@
 			"ginx": "./bin/ginx.js"
 		},
 		"engines": {
-        "node": "0.10.0"
+        "node": "0.10.x"
     },
     "dependencies": {
         "optimist": "0.3.5"
@@ -18,7 +18,7 @@
         "fs-extra": "0.5.0",
         "mocha": "1.8.1"
     },
-    "description": "A fast Nginx log parser for node.js written in Javascript.",
+    "description": "A Nginx log parser for node.js written in Javascript.",
     "author": "Aziz Khoury<bentael@gmail.com>",
     "homepage": "https://github.com/akhoury/ginx",
     "repository": {
