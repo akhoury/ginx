@@ -4,18 +4,22 @@ Ginx
 Ginx is a fast Nginx log parser written in Javascript; It can persist cursors of each file, to continue where it left off in case of a
 shutdown, unexpected exception or Ctrl+D, all that with the option of parsing a directory of files instead of one file.
 
-##TODO##
+EXAMPLE USAGE
+-------------
 
-* add tail -f feature to the command line tool using fs.watch or node-tail module
-* add DeleteStorage to the API 
-* add auto detection feature for the format based on an example log line.
-* add support for Error logs
-* log with different levels (info, error, warning, debug, trace) to an optional log file
-* refactor some of the big functions
-* support other encodings
-* optional DEBUG param flag, and input/output paths flags
-* increase test coverage, seriously
-... along with few others entered as issues.
+	var Ginx = require("./lib/ginx");
+	var ginx = new Ginx();
+	//example read from file
+	ginx.parseFile("nginx_prod.log",
+	  function(err, row){
+		  if (err) throw err;
+		  console.log("this will print each parsed line:" + JSON.stringify(row));
+	  },
+	  function(err, file){
+		if (err) throw err;
+		 console.log(file + " parsing complete");
+	  }
+	);
 
 API
 ---
@@ -95,19 +99,16 @@ or manually
 
 you can 'node demo.js' to try it out quick, but please open demo.js and read the comments quickly.
 
-EXAMPLE USAGE
--------------
+##TODO##
 
-	var Ginx = require("./lib/ginx");
-	var ginx = new Ginx();
-	//example read from file
-	ginx.parseFile("nginx_prod.log", 	
-	  function(err, row){
-		  if (err) throw err;
-		  console.log("this will print each parsed line:" + JSON.stringify(row));
-	  },	  
-	  function(err, file){
-		if (err) throw err;
-		 console.log(file + " parsing complete");
-	  }
-	);
+* add tail -f feature to the command line tool using fs.watch or node-tail module
+* add DeleteStorage to the API
+* add auto detection feature for the format based on an example log line.
+* add support for Error logs
+* log with different levels (info, error, warning, debug, trace) to an optional log file
+* refactor some of the big functions
+* support other encodings
+* optional DEBUG param flag, and input/output paths flags
+* increase test coverage, seriously
+... along with few others entered as issues.
+
