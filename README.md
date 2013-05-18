@@ -7,7 +7,7 @@ shutdown, unexpected exception or Ctrl+D, all that with the option of parsing a 
 EXAMPLE USAGE
 -------------
 
-	var Ginx = require("./lib/ginx");
+	var Ginx = require("ginx");
 	var ginx = new Ginx();
 	//example read from file
 	ginx.parseFile("nginx_prod.log",
