@@ -1,15 +1,15 @@
 {
     "name": "ginx",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "directories": {
         "lib": "./lib"
     },
     "main": "./lib/ginx",
     "bin": {
-			"ginx": "./bin/ginx.js"
-		},
-		"engines": {
-        "node": "0.10.x"
+        "ginx": "./bin/ginx.js"
+    },
+    "engines": {
+        "node": ">0.10.x"
     },
     "dependencies": {
         "optimist": "0.3.x"
