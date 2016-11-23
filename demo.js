@@ -31,12 +31,12 @@ testHelper.setupTest(100, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS
     // default is {'persistent': true, 'fieldsToObjects': false} and the default Nginx access_log, check ./lib/ginx.js source to see the default format
     // fieldsToObjects when true, it will try to convert each column's value to it's corresponding objects, so far i only parse dates to Date,  numbers to Number,and every '-' to null 
     // turning that to False will impact performance positevly as well, but of course everything depends on what you're trying to do with the logs, 
-    var parser = new Ginx({'persistent': true, 'fieldsToObjects': false});
+    var parser = new Ginx('$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $request_time', {'persistent': true, 'fieldsToObjects': false});
     
     
 //UNCOMMENT THIS BLOCK, COMMENT THE ONE BELOW, to try out parseDir() alone, 
 //(you can test them together, it's just if you're parsing a mutual file, it's record will get overwritten by the last occurence and you will get the its rowCallbacks twice)    
-///* 
+/*
     parser.parseDir(path.join(__dirname, "/./test/tmplogs"),
         function (err, row) {
             if (err) throw err;
@@ -74,8 +74,8 @@ testHelper.setupTest(100, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS
      * second callback prints out the file when it's completely parsed
      */
 //UNCOMMENT THIS BLOCK, COMMENT THE ONE ABOVE, to try out parseFile() alone 
-/*     // IF YOU WANT TO ONLY RUN THIS TEST parseFile (a single file) change the first param in setupTest to 0 - so you won't have to wait for it to create mock files
-	parser.parseFile(path.join(__dirname, "/./test/logs/nginx_prod-small.log"), 
+     // IF YOU WANT TO ONLY RUN THIS TEST parseFile (a single file) change the first param in setupTest to 0 - so you won't have to wait for it to create mock files
+	parser.parseFile(path.join(__dirname, "/./test/logs/nginx_prod-tiny.log"),
 	//parser.parseFile("/Users/akhoury/.Trash/nginx_prod-enourmous.log",
 		function (err, row) {
 			if (err) {throw err;}
@@ -83,12 +83,12 @@ testHelper.setupTest(100, 'large', true/* DELETE PREVIOUS STORAGE? - TOGGLE THIS
 			    //uncomment on your own risk - this will print out every row, 
 				//usually these would be persisted to the database, or handled in an analysis, or search
 			
-			 //console.log("[GINX-DEBUG-DEMO] " + JSON.stringify(row));
+			 console.log("[GINX-DEBUG-DEMO] " + JSON.stringify(row));
 			},
 		function(err, file){
 		 console.log("[GINX-DEBUG-DEMO] " + file + " parsing completed in " + (Date.now()-startTime) + " ms");
 		}
 	);
-*/
+// */
 /// BLOCK ENDS HERE 	
 });
